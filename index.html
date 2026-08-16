@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>AuteurAxe — Auteurs, concepts &amp; thèses</title>
+<style>
+:root{
+  --bg:#EAE2D0;
+  --card:#FBF8F1;
+  --ink:#26314D;
+  --ink-soft:#5A6482;
+  --accent:#8C3B4A;
+  --accent-soft:#C98A96;
+  --gold:#B98A2E;
+  --success:#3F7A5C;
+  --danger:#B23A32;
+  --shadow:0 4px 10px rgba(38,49,77,0.10);
+  --font-display: Georgia, "Iowan Old Style", "Palatino Linotype", "Times New Roman", serif;
+  --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --q-sante:#4E7D6F;
+  --q-etat:#3A4E7A;
+  --q-france:#8C3B4A;
+  --q-pacifique:#2E8C8C;
+  --q-ameriques:#A9552B;
+  --q-campagne:#6B8C3A;
+  --q-toutes:#5A5248;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+.hidden{display:none !important;}
+@media (prefers-reduced-motion: reduce){ *{transition:none !important; animation:none !important;} }
+
+button{font-family:var(--font-body); cursor:pointer;}
+button:focus-visible, .chip:focus-visible, .data-card:focus-visible{outline:3px solid var(--gold); outline-offset:2px;}
+
+.btn{background:var(--accent);color:#fff;border:none;padding:13px 24px;border-radius:8px;font-size:16px;font-weight:600;transition:opacity .2s, transform .15s;}
+.btn:hover{opacity:.88;}
+.btn:active{transform:scale(.98);}
+.btn.ghost{background:#00000012;color:var(--ink);}
+.btn:disabled{opacity:.4;cursor:not-allowed;}
+
+/* ===== HOME ===== */
+#screen-home{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;}
+.logo{font-family:var(--font-display);font-size:46px;font-weight:700;color:var(--ink);letter-spacing:-0.5px;}
+.logo span{color:var(--accent);}
+.subtitle{font-family:var(--font-body);font-size:16px;color:var(--ink-soft);margin:8px 0 36px;max-width:340px;}
+.home-stamp{font-family:var(--font-mono);font-size:11px;letter-spacing:1.5px;color:var(--gold);text-transform:uppercase;border:1px solid var(--gold);padding:4px 10px;border-radius:20px;margin-bottom:26px;}
+
+/* ===== TOP BAR (shared) ===== */
+.top-bar{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--card);box-shadow:var(--shadow);flex-shrink:0;z-index:5;}
+.back-btn{font-size:15px;font-weight:600;color:var(--ink-soft);cursor:pointer;padding:4px 6px;}
+.back-btn:hover{color:var(--ink);}
+.hud{display:flex;align-items:center;gap:14px;font-size:14px;font-weight:600;}
+.hud .lives{letter-spacing:2px;}
+.hud .score-pill{background:var(--ink);color:#fff;padding:4px 10px;border-radius:20px;font-family:var(--font-mono);font-size:13px;}
+.hud .progress-pill{font-family:var(--font-mono);color:var(--ink-soft);font-size:13px;}
+
+/* ===== LIST SCREENS ===== */
+.list-screen{flex:1;padding:22px 18px 40px;overflow-y:auto;display:flex;flex-direction:column;align-items:center;}
+.header-title{font-family:var(--font-display);font-size:24px;margin:6px 0 6px;text-align:center;}
+.header-sub{font-size:14px;color:var(--ink-soft);margin-bottom:22px;text-align:center;max-width:420px;}
+.grid-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;width:100%;max-width:1000px;}
+
+/* fiche / index-card look */
+.data-card{background:var(--card);border-radius:4px 10px 10px 10px;overflow:hidden;box-shadow:var(--shadow);cursor:pointer;transition:transform .15s;position:relative;border:1px solid #00000010;}
+.data-card:hover{transform:translateY(-3px);}
+.tab{height:8px;width:100%;}
+.card-body{padding:16px 18px;}
+.card-title{font-family:var(--font-display);font-size:19px;font-weight:700;color:var(--ink);}
+.card-meta{font-size:13px;color:var(--ink-soft);margin-top:4px;}
+.card-count{font-family:var(--font-mono);font-size:12px;color:var(--gold);margin-top:10px;letter-spacing:.5px;}
+
+/* mode cards */
+.grid-modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;width:100%;max-width:900px;}
+.mode-card{background:var(--card);border-radius:12px;padding:22px 20px;text-align:left;box-shadow:var(--shadow);cursor:pointer;transition:transform .15s;border-left:6px solid var(--accent);}
+.mode-card:hover{transform:translateY(-3px);}
+.mode-card h3{font-family:var(--font-display);font-size:20px;margin-bottom:6px;}
+.mode-card p{font-size:13.5px;color:var(--ink-soft);line-height:1.4;}
+.mode-tag{display:inline-block;font-family:var(--font-mono);font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+
+/* ===== DECOUVERTE ===== */
+#screen-decouverte{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.discover-grid{flex:1;overflow-y:auto;padding:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;max-width:1000px;margin:0 auto;width:100%;}
+.concept-tag{display:inline-block;font-family:var(--font-mono);font-size:11.5px;background:#00000008;color:var(--ink-soft);padding:3px 8px;border-radius:5px;margin-top:8px;}
+
+/* ===== GAME SCREENS ===== */
+.game-body{flex:1;display:flex;flex-direction:column;overflow-y:auto;padding:18px;align-items:center;}
+.instruction{font-size:13.5px;color:var(--ink-soft);text-align:center;margin-bottom:16px;max-width:480px;}
+
+/* association */
+.assoc-wrap{display:flex;gap:18px;width:100%;max-width:700px;flex-wrap:wrap;justify-content:center;}
+.assoc-col{flex:1;min-width:260px;display:flex;flex-direction:column;gap:10px;}
+.assoc-col-label{font-family:var(--font-mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:2px;text-align:center;}
+.opt-btn{background:var(--card);border:2px solid #00000012;border-radius:10px;padding:13px 14px;font-size:14.5px;text-align:left;line-height:1.35;box-shadow:var(--shadow);transition:all .15s;color:var(--ink);}
+.opt-btn:hover:not(:disabled){border-color:var(--accent-soft);}
+.opt-btn.selected{border-color:var(--accent);background:#8C3B4A0F;}
+.opt-btn.correct{border-color:var(--success);background:#3F7A5C15;color:var(--success);}
+.opt-btn.wrong{border-color:var(--danger);background:#B23A3215;animation:shake .35s;}
+.opt-btn:disabled{cursor:default;}
+.opt-btn.matched{opacity:.45;}
+@keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-5px);}75%{transform:translateX(5px);}}
+
+/* qui suis-je */
+.clue-panel{background:var(--card);border-radius:12px;box-shadow:var(--shadow);padding:20px;width:100%;max-width:520px;margin-bottom:18px;}
+.clue-item{font-size:15px;padding:8px 0;border-bottom:1px dashed #00000015;}
+.clue-item:last-child{border-bottom:none;}
+.clue-label{font-family:var(--font-mono);font-size:10.5px;text-transform:uppercase;letter-spacing:1px;color:var(--gold);display:block;margin-bottom:2px;}
+.qcm-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:520px;}
+@media (max-width:480px){.qcm-grid{grid-template-columns:1fr;}}
+.qcm-btn{background:var(--card);border:2px solid #00000012;border-radius:10px;padding:14px;font-size:14.5px;font-weight:600;box-shadow:var(--shadow);color:var(--ink);}
+.qcm-btn.correct{border-color:var(--success);background:#3F7A5C15;color:var(--success);}
+.qcm-btn.wrong{border-color:var(--danger);background:#B23A3215;color:var(--danger);animation:shake .35s;}
+
+/* duel */
+.duel-sujet{background:var(--ink);color:#fff;border-radius:12px;padding:22px;width:100%;max-width:560px;font-family:var(--font-display);font-size:19px;line-height:1.45;margin-bottom:18px;box-shadow:var(--shadow);}
+.chips-wrap{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:560px;margin-bottom:20px;}
+.chip{background:var(--card);border:2px solid #00000015;border-radius:24px;padding:11px 18px;font-size:14.5px;font-weight:600;box-shadow:var(--shadow);}
+.chip.on{border-color:var(--accent);background:var(--accent);color:#fff;}
+.feedback-panel{background:var(--card);border-radius:12px;padding:20px;width:100%;max-width:560px;box-shadow:var(--shadow);margin-bottom:18px;}
+.feedback-verdict{font-family:var(--font-display);font-size:19px;margin-bottom:8px;}
+.feedback-verdict.ok{color:var(--success);}
+.feedback-verdict.half{color:var(--gold);}
+.feedback-verdict.no{color:var(--danger);}
+.feedback-explain{font-size:14.5px;line-height:1.5;color:var(--ink-soft);}
+
+/* ===== END SCREEN ===== */
+#screen-end{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;}
+.end-title{font-family:var(--font-display);font-size:26px;margin-bottom:10px;}
+.end-score{font-size:16px;color:var(--ink-soft);margin-bottom:6px;}
+.end-msg{font-size:14px;color:var(--ink-soft);max-width:380px;margin-bottom:24px;}
+
+/* ===== MODAL ===== */
+.modal-overlay{position:fixed;inset:0;background:rgba(38,49,77,0.55);display:flex;align-items:center;justify-content:center;z-index:50;padding:20px;}
+.modal-content{background:var(--card);border-radius:14px;max-width:480px;width:100%;max-height:85vh;overflow-y:auto;padding:26px;position:relative;box-shadow:0 10px 30px rgba(0,0,0,.25);}
+.close-btn{position:absolute;top:14px;right:18px;font-size:26px;color:var(--ink-soft);cursor:pointer;line-height:1;}
+.modal-tag{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#fff;display:inline-block;padding:3px 10px;border-radius:20px;margin-bottom:12px;}
+.modal-title{font-family:var(--font-display);font-size:24px;font-weight:700;margin-bottom:2px;}
+.modal-meta{font-size:13.5px;color:var(--ink-soft);margin-bottom:14px;}
+.modal-block{margin-bottom:14px;}
+.modal-block-label{font-family:var(--font-mono);font-size:10.5px;text-transform:uppercase;letter-spacing:1px;color:var(--gold);margin-bottom:4px;}
+.modal-block-text{font-size:14.5px;line-height:1.55;}
+.modal-citation{font-family:var(--font-display);font-style:italic;font-size:15.5px;border-left:3px solid var(--accent);padding-left:12px;margin:14px 0;color:var(--ink);}
+
+/* toast */
+#toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:20px;font-size:13.5px;font-weight:600;z-index:60;box-shadow:var(--shadow);}
+</style>
+</head>
+<body>
+
+<!-- ACCUEIL -->
+<div id="screen-home">
+  <div class="home-stamp">Agrégation externe de géographie</div>
+  <div class="logo">Auteur<span>Axe</span></div>
+  <div class="subtitle">Le fichier des auteurs, concepts &amp; thèses du programme.</div>
+  <button class="btn" onclick="showScreen('screen-questions')">Ouvrir le fichier</button>
+</div>
+
+<!-- CHOIX DE LA QUESTION -->
+<div id="screen-questions" class="list-screen hidden">
+  <h2 class="header-title">Choisissez une question</h2>
+  <p class="header-sub">Chaque question du programme est une fiche à part — plus le fichier « Bilan » qui les mélange toutes.</p>
+  <div class="grid-cards" id="questions-container"></div>
+  <div style="margin-top:26px;margin-bottom:40px;">
+    <button class="btn ghost" onclick="showScreen('screen-home')">Retour à l'accueil</button>
+  </div>
+</div>
+
+<!-- CHOIX DU MODE -->
+<div id="screen-modes" class="list-screen hidden">
+  <h2 class="header-title" id="modes-title">Choisissez un mode</h2>
+  <p class="header-sub">Quatre paliers, du plus simple au plus proche de l'épreuve : consulter, associer, deviner, mobiliser.</p>
+  <div class="grid-modes">
+    <div class="mode-card" style="border-left-color:#5A5248;" onclick="startMode('decouverte')">
+      <span class="mode-tag">Palier 0 · Étude</span>
+      <h3>Découverte</h3>
+      <p>Consultez les fiches auteurs complètes, sans jouer, pour apprendre ou réviser.</p>
+    </div>
+    <div class="mode-card" onclick="startMode('association')">
+      <span class="mode-tag">Palier 1 · Reconnaissance</span>
+      <h3>Association</h3>
+      <p>Reliez chaque auteur à son concept clé, puis à sa thèse. 3 vies.</p>
+    </div>
+    <div class="mode-card" onclick="startMode('quisuisje')">
+      <span class="mode-tag">Palier 2 · Rappel actif</span>
+      <h3>Qui suis-je ?</h3>
+      <p>Devinez l'auteur à partir d'indices progressifs. Moins d'indices = plus de points.</p>
+    </div>
+    <div class="mode-card" onclick="startMode('duel')">
+      <span class="mode-tag">Palier 3 · Mobilisation</span>
+      <h3>Duel historiographique</h3>
+      <p>Face à un sujet, choisissez les deux auteurs à mobiliser en tension.</p>
+    </div>
+  </div>
+  <div style="margin-top:26px;margin-bottom:40px;">
+    <button class="btn ghost" onclick="showScreen('screen-questions')">Retour aux questions</button>
+  </div>
+</div>
+
+<!-- DECOUVERTE -->
+<div id="screen-decouverte" class="hidden">
+  <div class="top-bar">
+    <div class="back-btn" onclick="showScreen('screen-modes')">‹ Retour</div>
+    <div class="hud"><span id="discover-count"></span></div>
+  </div>
+  <div class="discover-grid" id="discover-container"></div>
+</div>
+
+<!-- ASSOCIATION -->
+<div id="screen-association" class="hidden">
+  <div class="top-bar">
+    <div class="back-btn" onclick="quitGame()">‹ Retour</div>
+    <div class="hud">
+      <span class="score-pill" id="assoc-score">0 pts</span>
+      <span class="lives" id="assoc-lives">❤️❤️❤️</span>
+      <span class="progress-pill" id="assoc-progress">Lot 1/1</span>
+    </div>
+  </div>
+  <div class="game-body">
+    <p class="instruction" id="assoc-instruction">Touchez un auteur, puis sa correspondance.</p>
+    <div class="assoc-wrap">
+      <div class="assoc-col">
+        <div class="assoc-col-label">Auteurs</div>
+        <div id="assoc-left"></div>
+      </div>
+      <div class="assoc-col">
+        <div class="assoc-col-label" id="assoc-right-label">Concepts clés</div>
+        <div id="assoc-right"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- QUI SUIS-JE -->
+<div id="screen-quisuisje" class="hidden">
+  <div class="top-bar">
+    <div class="back-btn" onclick="quitGame()">‹ Retour</div>
+    <div class="hud">
+      <span class="score-pill" id="qsj-score">0 pts</span>
+      <span class="lives" id="qsj-lives">❤️❤️❤️</span>
+      <span class="progress-pill" id="qsj-progress">1/1</span>
+    </div>
+  </div>
+  <div class="game-body">
+    <p class="instruction">Devinez l'auteur avec le moins d'indices possible.</p>
+    <div class="clue-panel" id="qsj-clues"></div>
+    <button class="btn ghost" id="qsj-next-clue" onclick="revealNextClueQSJ()" style="margin-bottom:20px;">Indice suivant</button>
+    <div class="qcm-grid" id="qsj-options"></div>
+  </div>
+</div>
+
+<!-- DUEL -->
+<div id="screen-duel" class="hidden">
+  <div class="top-bar">
+    <div class="back-btn" onclick="quitGame()">‹ Retour</div>
+    <div class="hud">
+      <span class="score-pill" id="duel-score">0 pts</span>
+      <span class="progress-pill" id="duel-progress">Manche 1/1</span>
+    </div>
+  </div>
+  <div class="game-body">
+    <p class="instruction">Sélectionnez les deux auteurs à mobiliser pour ce sujet.</p>
+    <div class="duel-sujet" id="duel-sujet"></div>
+    <div class="chips-wrap" id="duel-chips"></div>
+    <button class="btn" id="duel-validate" onclick="validateDuel()" disabled>Valider</button>
+    <div class="feedback-panel hidden" id="duel-feedback">
+      <div class="feedback-verdict" id="duel-verdict"></div>
+      <div class="feedback-explain" id="duel-explain"></div>
+    </div>
+    <button class="btn hidden" id="duel-next" onclick="nextDuelRound()" style="margin-top:14px;">Manche suivante</button>
+  </div>
+</div>
+
+<!-- FIN -->
+<div id="screen-end" class="hidden">
+  <div class="end-title" id="end-title">Terminé</div>
+  <div class="end-score">Score : <strong id="end-score-val">0</strong> points</div>
+  <div class="end-msg" id="end-msg"></div>
+  <div style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center;">
+    <button class="btn ghost" onclick="showScreen('screen-modes')">Autre mode</button>
+    <button class="btn" id="end-replay" onclick="replayLast()">Rejouer</button>
+  </div>
+</div>
+
+<!-- MODAL FICHE -->
+<div id="modal-fiche" class="modal-overlay hidden">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeModal()">×</span>
+    <span class="modal-tag" id="modal-tag"></span>
+    <div class="modal-title" id="modal-nom"></div>
+    <div class="modal-meta" id="modal-meta"></div>
+    <div class="modal-block">
+      <div class="modal-block-label">Terrain</div>
+      <div class="modal-block-text" id="modal-terrain"></div>
+    </div>
+    <div class="modal-block">
+      <div class="modal-block-label">Concept clé</div>
+      <div class="modal-block-text" id="modal-concept"></div>
+    </div>
+    <div class="modal-block">
+      <div class="modal-block-label">Thèse principale</div>
+      <div class="modal-block-text" id="modal-these"></div>
+    </div>
+    <div class="modal-citation hidden" id="modal-citation-wrap">
+      <span id="modal-citation"></span>
+    </div>
+    <div class="modal-block hidden" id="modal-remarque-wrap">
+      <div class="modal-block-label" id="modal-remarque-label">Limites</div>
+      <div class="modal-block-text" id="modal-remarque"></div>
+    </div>
+    <div class="modal-block">
+      <div class="modal-block-label">Œuvre phare</div>
+      <div class="modal-block-text" id="modal-oeuvre"></div>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="hidden"></div>
+
+<script>
+/* ========================================================================
+   DONNÉES
+======================================================================== */
+const QUESTIONS = [
+  {id:"sante", nom:"Géographies de la santé", color:"var(--q-sante)"},
+  {id:"etat", nom:"L'État, objet géographique", color:"var(--q-etat)"},
+  {id:"france", nom:"La France", color:"var(--q-france)"},
+  {id:"pacifique", nom:"Le Pacifique", color:"var(--q-pacifique)"},
+  {id:"ameriques", nom:"Les Amériques (1550-1660)", color:"var(--q-ameriques)"},
+  {id:"campagne", nom:"Vivre à la campagne (1815-1970)", color:"var(--q-campagne)"}
+];
+
+const AUTEURS = [
+  // ---- SANTE ----
+  {id:"s_sorre", question:"sante", nom:"Maximilien Sorre", identite:"Géographe français classique (1880-1962)", courant:"Géographie classique, fondements de l'écologie humaine", oeuvre:"Les fondements biologiques de la géographie humaine (1943)", terrain:"Global", conceptCard:"Complexe pathogène", theseCard:"La maladie s'inscrit dans un milieu géographique reliant climat, faune, flore, agent pathogène et l'Homme.", theseFull:"La maladie n'est pas qu'un phénomène biologique isolé. Elle s'inscrit dans un milieu géographique spécifique réunissant des conditions climatiques, la faune, la flore, l'agent pathogène et l'Homme, qui façonne ce milieu.", remarqueLabel:"Limites", remarque:"Une vision très axée sur le milieu naturel et la biologie, qui peine à rendre compte des déterminants purement socio-économiques de la santé moderne."},
+  {id:"s_vigneron", question:"sante", nom:"Emmanuel Vigneron", identite:"Géographe français contemporain (né en 1957)", courant:"Géographie de l'aménagement, analyse spatiale", oeuvre:"Les inégalités de santé dans les territoires français (2011)", terrain:"La France (hôpitaux, déserts médicaux)", conceptCard:"Géographie impliquée", theseCard:"L'aménagement sanitaire est un choix politique ; la géographie doit outiller les décideurs contre les inégalités d'accès aux soins.", theseFull:"L'aménagement sanitaire (répartition des lits, des médecins, des hôpitaux) est un choix politique. La géographie doit être « impliquée », c'est-à-dire fournir des outils concrets aux décideurs pour réduire les inégalités d'accès aux soins.", remarqueLabel:"Limites", remarque:"Une géographie très institutionnelle et quantitative, qui peut parfois délaisser le vécu sensible des patients."},
+  {id:"s_salem", question:"sante", nom:"Gérard Salem", identite:"Géographe français contemporain (né en 1952)", courant:"Épidémiologie spatiale, géographie de la santé", oeuvre:"Atlas mondial de la santé (2020)", terrain:"Pays du Sud (Sénégal, Afrique de l'Ouest), comparaisons mondiales", conceptCard:"Transition sanitaire, One Health", theseCard:"Les systèmes de soins s'analysent en interaction avec l'urbanisation ; la santé est le miroir des inégalités socio-spatiales.", theseFull:"Il faut analyser spatialement les systèmes de soins en interaction avec les dynamiques territoriales, notamment l'urbanisation rapide. La santé est le miroir parfait des inégalités socio-spatiales à toutes les échelles.", remarqueLabel:"Limites", remarque:"Fort tropisme urbain dans ses recherches initiales."},
+  {id:"s_hoyez", question:"sante", nom:"Hoyez &amp; Gasquez-Blanchard", identite:"Géographes françaises contemporaines", courant:"Géographie sociale, critique et intersectionnelle", oeuvre:"Articles sur l'accès aux soins et la migration (2010-2020)", terrain:"France, espaces urbains, foyers de migrants", conceptCard:"Géographie du care", theseCard:"L'espace du soin révèle des rapports de domination selon la position sociale, l'origine ou le genre.", theseFull:"Les expériences face à la maladie diffèrent radicalement selon la position sociale, l'origine ou le genre. L'espace du care révèle des rapports de domination territoriaux : qui a accès à quel hôpital ? qui subit l'éloignement ?", remarqueLabel:"Limites", remarque:"Des études souvent qualitatives à micro-échelle, difficiles à généraliser à l'échelle d'un pays."},
+  {id:"s_gesler", question:"sante", nom:"Wilbert Gesler", identite:"Géographe anglo-saxon contemporain", courant:"Géographie culturelle de la santé", oeuvre:"Therapeutic Landscapes (1992)", terrain:"Sanatoriums, lieux de pèlerinage (Lourdes), espaces naturels", conceptCard:"Paysage thérapeutique", theseCard:"Certains lieux naturels, architecturaux ou symboliques sont perçus comme favorisant intrinsèquement la guérison.", theseFull:"Certains agencements spatiaux (naturels, architecturaux, symboliques) sont perçus comme favorisant intrinsèquement la guérison et le bien-être physique et mental.", remarqueLabel:"Limites", remarque:"Un concept parfois galvaudé aujourd'hui, où le moindre espace vert urbain est qualifié de « thérapeutique »."},
+
+  // ---- ETAT ----
+  {id:"e_levy", question:"etat", nom:"Jacques Lévy", identite:"Géographe français contemporain (né en 1952)", courant:"Théorie de l'espace des sociétés, géographie politique", oeuvre:"Géographie du politique (1991)", terrain:"Échelle mondiale, théorique", conceptCard:"Dispositif de puissance", theseCard:"L'État n'est pas un contenant naturel mais un acteur spatial parmi d'autres, mobilisant un dispositif de puissance.", theseFull:"L'État n'est pas un « contenant » naturel ou le cadre évident de la géographie. C'est un acteur parmi d'autres (firmes, ONG, individus) qui tente de s'imposer sur un territoire via un ensemble de moyens qu'il nomme le « dispositif de puissance ».", citation:"L'État est un « acteur spatial peu pensé »."},
+  {id:"e_raffestin", question:"etat", nom:"Claude Raffestin", identite:"Géographe franco-suisse contemporain (1936-2025)", courant:"Géographie politique relationnelle", oeuvre:"Pour une géographie du pouvoir (1980)", terrain:"La Suisse, l'Europe, les frontières", conceptCard:"Sémiosphère nationale", theseCard:"Le pouvoir de l'État s'imprime dans l'espace par des signes ; la capitale en est le théâtre suprême.", theseFull:"Le pouvoir de l'État s'imprime dans l'espace par des signes et des symboles. La capitale n'est pas qu'un centre administratif, c'est une « sémiosphère », le théâtre suprême de la mise en scène idéologique de l'État."},
+  {id:"e_foucher", question:"etat", nom:"Michel Foucher", identite:"Géographe et diplomate français (né en 1946)", courant:"Géopolitique", oeuvre:"Le Retour des frontières (2016)", terrain:"Monde, surtout Europe et Afrique", conceptCard:"Horogenèse, dyade", theseCard:"Contre l'idée d'un monde sans frontières, l'État produit sans cesse de nouvelles lignes de démarcation.", theseFull:"Contre l'idée d'un monde sans frontières lié à la mondialisation, il montre que l'État produit et durcit sans cesse de nouvelles lignes de démarcation. La frontière est l'acte politique ultime de la souveraineté étatique.", citation:"Il n'est pas d'État sans territoire, ni de territoire sans frontières."},
+  {id:"e_brenner", question:"etat", nom:"Neil Brenner", identite:"Géographe américain contemporain", courant:"Géographie urbaine et politique critique", oeuvre:"New State Spaces (2004)", terrain:"Théorique, comparatif", conceptCard:"Rescaling", theseCard:"L'État-nation ne décline pas : il se recompose en déléguant vers le haut et vers le bas pour survivre au capitalisme global.", theseFull:"L'État nation ne décline pas face à la mondialisation, il se « ré-étalonne » (rescaling). Il délègue ses pouvoirs vers le haut (organisations supra-nationales) et vers le bas (métropoles compétitives) pour survivre au capitalisme global.", horsProgramme:true},
+
+  // ---- FRANCE ----
+  {id:"f_vanier", question:"france", nom:"Martin Vanier", identite:"Géographe et urbaniste français (né en 1958)", courant:"Aménagement du territoire, prospective", oeuvre:"Le pouvoir des territoires (2010)", terrain:"Périurbain et réseaux intercommunaux français", conceptCard:"Interterritorialité", theseCard:"Le millefeuille territorial français est périmé ; il faut aménager les flux et les liens plutôt que les limites.", theseFull:"Le découpage en « mille-feuille » de la France (communes, départements, régions) est périmé face à la réticularité et aux mobilités des habitants. Il faut aménager les flux et les liens entre les territoires (interterritorialité) plutôt que leurs limites.", horsProgramme:true},
+  {id:"f_davezies", question:"france", nom:"Laurent Davezies", identite:"Économiste urbain et géographe français (né en 1952)", courant:"Géographie économique", oeuvre:"La crise qui vient (2012)", terrain:"France métropolitaine", conceptCard:"Économie présentielle", theseCard:"La métropolisation crée la richesse, mais c'est l'économie présentielle qui la redistribue vers le reste du territoire.", theseFull:"La métropolisation crée la richesse, mais c'est l'État et l'économie présentielle (retraites, tourisme, fonctionnaires) qui permettent de redistribuer cette richesse vers le reste du territoire français, évitant l'explosion sociale.", horsProgramme:true},
+  {id:"f_jousseaume", question:"france", nom:"Valérie Jousseaume", identite:"Géographe française contemporaine (née en 1969)", courant:"Géographie rurale", oeuvre:"Plouc Pride (2021)", terrain:"Campagnes françaises", conceptCard:"Post-ruralité", theseCard:"Les espaces ruraux ne sont plus la périphérie subie mais des espaces pionniers de l'écologie et de la transition.", theseFull:"Les espaces ruraux ne doivent plus être vus comme la périphérie subie ou le passé de la métropole. Ils sont aujourd'hui des espaces pionniers de l'écologie et de la transition, porteurs d'un nouveau modèle de développement.", horsProgramme:true},
+
+  // ---- PACIFIQUE ----
+  {id:"p_hauofa", question:"pacifique", nom:"Epeli Hau'Ofa", identite:"Écrivain et anthropologue océanien (1939-2009)", courant:"Pensée post-coloniale océanienne", oeuvre:"Our Sea of Islands (1993)", terrain:"Le bassin océanien", conceptCard:"Mer d'îles", theseCard:"Contre la vision coloniale d'îles isolées, l'océan est pour les peuples du Pacifique un réseau qui relie.", theseFull:"Il déconstruit la vision coloniale occidentale qui voit le Pacifique comme des « îles isolées dans une mer lointaine ». Pour les peuples du Pacifique, l'océan n'est pas un obstacle qui sépare, mais un réseau qui relie : c'est une « mer d'îles ».", remarqueLabel:"Limites", remarque:"Une vision identitaire puissante, qui gomme parfois les fortes inégalités de puissance au sein même des îles."},
+  {id:"p_bonnemaison", question:"pacifique", nom:"Joël Bonnemaison", identite:"Géographe français (1940-1997)", courant:"Géographie culturelle, ethnogéographie", oeuvre:"L'arbre et la pirogue (1986)", terrain:"Vanuatu, Nouvelle-Calédonie, Océanie", conceptCard:"Iléité", theseCard:"L'identité pacifique conjugue enracinement terrestre et mobilité maritime ; l'insularité y est vécue comme ouverture.", theseFull:"Dans le Pacifique, l'identité repose sur une double dimension : l'enracinement dans le territoire terrestre (l'arbre) et l'extrême mobilité maritime (la pirogue). L'insularité (iléité) n'y est pas vécue comme un isolement, mais comme une ouverture au monde."},
+  {id:"p_duvat", question:"pacifique", nom:"Virginie Duvat", identite:"Géographe française contemporaine (née en 1968)", courant:"Géographie de l'environnement, risques", oeuvre:"Auteure principale pour le GIEC (rapports océans)", terrain:"Atolls coralliens (Tuvalu, Kiribati), Polynésie", conceptCard:"Vulnérabilité, adaptation", theseCard:"Les petites nations insulaires sont vulnérables au changement climatique, mais des capacités d'adaptation existent.", theseFull:"Face au changement climatique, elle démontre la vulnérabilité extrême des « petites nations » insulaires. Elle réfute toutefois la fatalité de l'effondrement immédiat et met en lumière les capacités d'adaptation, parfois contrecarrées par la mal-adaptation humaine (ex. bétons côtiers)."},
+  {id:"p_grataloup", question:"pacifique", nom:"Grataloup &amp; Blais", identite:"Géohistoriens français contemporains", courant:"Géohistoire, géographie culturelle", oeuvre:"L'invention des continents (2009) / Voyages au grand océan (2005)", terrain:"Pacifique, vu depuis l'Europe", conceptCard:"Méta-géographie", theseCard:"Le découpage du Pacifique en Mélanésie, Micronésie, Polynésie est une invention européocentrée héritée des empires coloniaux.", theseFull:"Le « Pacifique », ses sous-divisions (Mélanésie, Micronésie, Polynésie) ou le concept de « Bout du monde » sont de pures inventions européocentrées, héritées des empires coloniaux et des expéditions de Cook ou Bougainville, imposées aux populations locales."},
+  {id:"p_gay", question:"pacifique", nom:"Jean-Christophe Gay", identite:"Géographe français contemporain (né en 1962)", courant:"Géographie du tourisme, géographie des Outre-mers", oeuvre:"Les discontinuités spatiales (1995)", terrain:"Polynésie française, Nouvelle-Calédonie", conceptCard:"Discontinuité, exotisme", theseCard:"Le tourisme pacifique, marginal en volume, repose sur des imaginaires d'exotisme mondialisés extrêmement puissants.", theseFull:"Le tourisme dans le Pacifique est paradoxal : bien que marginal en volume à l'échelle mondiale, il repose sur des imaginaires d'exotisme mondialisés extrêmement puissants (vahiné, cocotier). Il analyse aussi l'intégration asymétrique des statuts ultra-marins français dans cet espace."},
+
+  // ---- AMERIQUES ----
+  {id:"a_elliott", question:"ameriques", nom:"John H. Elliott", identite:"Historien britannique (1930-2022), hispaniste", courant:"Histoire comparée, histoire atlantique", oeuvre:"Empires of the Atlantic World (2006)", terrain:"Amérique espagnole et colonies britanniques, en miroir", conceptCard:"Monarchie composite", theseCard:"Les différences entre colonisation espagnole et anglaise tiennent surtout à l'environnement et au calendrier de conquête.", theseFull:"Il déconstruit les stéréotypes nationaux opposant un Espagnol cruel à un Anglais industrieux : les différences entre les deux modèles coloniaux s'expliquent surtout par l'environnement, le calendrier de la conquête et la densité démographique des sociétés autochtones rencontrées.", remarqueLabel:"Limites", remarque:"Une comparaison à grande échelle qui peut lisser certaines singularités locales au profit du modèle général."},
+  {id:"a_gruzinski", question:"ameriques", nom:"Serge Gruzinski", identite:"Historien français contemporain (né en 1949)", courant:"Histoire culturelle, histoire connectée / globale", oeuvre:"La Pensée métisse (1999)", terrain:"Nouvelle-Espagne, mondialisation ibérique", conceptCard:"Mondialisation ibérique", theseCard:"L'Amérique ibérique (1550-1660) est un laboratoire de mondialisation, produisant des cultures métisses et transculturelles.", theseFull:"L'Amérique ibérique des années 1550-1660 est un premier laboratoire de « mondialisation », marqué par une circulation massive d'objets et de croyances, produisant des cultures métisses et transculturelles, non une simple copie de l'Europe.", remarqueLabel:"Limites", remarque:"Focale centrée sur le Mexique/Pérou, moins développée pour les colonies non ibériques."},
+  {id:"a_white", question:"ameriques", nom:"Richard White", identite:"Historien américain contemporain (né en 1947)", courant:"Ethnohistoire, relations euro-amérindiennes", oeuvre:"The Middle Ground (1991)", terrain:"Région des Grands Lacs, Amérique du Nord", conceptCard:"Middle ground", theseCard:"Là où aucun camp ne domine, Européens et Amérindiens créent des compromis diplomatiques et culturels inédits.", theseFull:"Là où ni les Européens ni les nations amérindiennes n'ont la force de dominer l'autre, se créent des compromis diplomatiques, culturels et commerciaux inédits. Un modèle qui rompt avec le récit d'une conquête unilatérale.", remarqueLabel:"Limites", remarque:"Modèle élaboré sur un espace et une période surtout post-1660, à transposer avec prudence."},
+  {id:"a_havard", question:"ameriques", nom:"Gilles Havard", identite:"Historien français contemporain, spécialiste Nouvelle-France", courant:"Histoire des alliances franco-amérindiennes", oeuvre:"Empire et métissages (2003)", terrain:"Nouvelle-France, Grands Lacs", conceptCard:"Système d'alliance", theseCard:"L'empire français en Amérique du Nord repose sur des alliances et des compromis culturels plus que sur une domination directe.", theseFull:"L'empire français en Amérique du Nord repose moins sur une domination territoriale directe que sur un système d'alliances et de compromis culturels avec les nations amérindiennes.", remarqueLabel:"Limites", remarque:"Son étude de référence porte surtout sur 1660-1715, à mobiliser avec prudence pour la borne 1550-1660."},
+  {id:"a_wachtel", question:"ameriques", nom:"Nathan Wachtel", identite:"Historien et anthropologue français (né en 1935)", courant:"Histoire des vaincus, ethnohistoire", oeuvre:"La Vision des vaincus (1971)", terrain:"Pérou, monde andin", conceptCard:"Vision des vaincus", theseCard:"Il faut écrire l'histoire de la conquête du point de vue des sociétés amérindiennes elles-mêmes.", theseFull:"Il faut écrire l'histoire de la conquête du point de vue des sociétés amérindiennes elles-mêmes, à partir de leurs propres sources et représentations.", remarqueLabel:"Limites", remarque:"Sources indigènes rares et souvent médiatisées par des scribes coloniaux."},
+  {id:"a_chaunu", question:"ameriques", nom:"Pierre Chaunu", identite:"Historien français (1923-2009), fondateur de l'histoire sérielle", courant:"École des Annales, histoire quantitative", oeuvre:"Séville et l'Atlantique (1955-1960)", terrain:"Système atlantique espagnol, flottes et commerce colonial", conceptCard:"Histoire sérielle", theseCard:"Le commerce atlantique espagnol suit des cycles longs mesurables, qui permettent de périodiser l'histoire économique de l'empire.", theseFull:"Le commerce transatlantique espagnol suit des cycles longs mesurables (courbes de trafic portuaire), qui permettent de périodiser l'histoire économique de l'empire colonial.", remarqueLabel:"Limites", remarque:"Approche très quantitative, qui laisse peu de place au vécu et aux acteurs individuels — à mobiliser en contraste avec Wachtel ou Gruzinski."},
+  {id:"a_crosby", question:"ameriques", nom:"Alfred Crosby", identite:"Historien américain (1931-2018), histoire environnementale", courant:"Histoire environnementale, écologie historique", oeuvre:"The Columbian Exchange (1972)", terrain:"Ensemble du monde atlantique", conceptCard:"Échange colombien", theseCard:"La conquête fut aussi un bouleversement biogéographique qui a redessiné les paysages et scellé le destin démographique du continent.", theseFull:"La conquête des Amériques fut aussi un bouleversement biogéographique (transferts de plantes, d'animaux, d'agents pathogènes) ayant redessiné les paysages et scellé le destin démographique du continent.", remarqueLabel:"Limites", remarque:"Un déterminisme biologique parfois excessif, qui peut minorer les dynamiques sociales et politiques propres aux sociétés amérindiennes."},
+
+  // ---- CAMPAGNE ----
+  {id:"c_mendras", question:"campagne", nom:"Henri Mendras", identite:"Sociologue français (1927-2003)", courant:"Sociologie rurale", oeuvre:"La Fin des paysans (1967)", terrain:"France rurale, tournant des années 1960", conceptCard:"Fin des paysans", theseCard:"Dans les années 1960 bascule le monde rural, de la société paysanne vers l'agriculteur inséré dans le capitalisme mondialisé.", theseFull:"Dans les années 1960 bascule le monde rural, d'une société paysanne tournée vers l'autosubsistance et rythmée par la nature vers la figure de l'agriculteur, chef de petite entreprise inséré dans le capitalisme mondialisé.", remarqueLabel:"À noter", remarque:"Seul auteur explicitement présent dans le texte du programme — référence quasi obligatoire pour clore la période dans les années 1970."},
+  {id:"c_weber", question:"campagne", nom:"Eugen Weber", identite:"Historien américain d'origine roumaine (1925-2007)", courant:"Histoire sociale et culturelle de la France contemporaine", oeuvre:"Peasants into Frenchmen / La Fin des terroirs (1976)", terrain:"Campagnes françaises, surtout 1870-1914", conceptCard:"Acculturation nationale", theseCard:"La France rurale ne devient pleinement française que tardivement, par l'école, l'armée et le rail.", theseFull:"La France rurale ne devient pleinement « française » que tardivement, sous l'effet conjugué de l'école républicaine, du service militaire et du désenclavement ferroviaire — modèle classique et très influent.", remarqueLabel:"Limites", remarque:"Minore les continuités rurales antérieures à 1870 ; rythme de l'« acculturation » contesté."},
+  {id:"c_agulhon", question:"campagne", nom:"Maurice Agulhon", identite:"Historien français (1926-2014)", courant:"Histoire sociale et politique, sociabilités", oeuvre:"La République au village (1970)", terrain:"Provence (Var), sociabilités villageoises", conceptCard:"Sociabilité villageoise", theseCard:"La politisation des campagnes se fait tôt et par le bas, via les sociabilités traditionnelles, bien avant l'école de Jules Ferry.", theseFull:"Sert de correctif régional et méthodologique à Weber : la politisation du monde rural se fait très tôt et par le bas, via les sociabilités traditionnelles (cafés, cercles, chambrées), bien avant l'école de Jules Ferry.", remarqueLabel:"Limites", remarque:"Étude ancrée dans le Midi provençal ; généralisation à d'autres régions à nuancer."},
+  {id:"c_corbin", question:"campagne", nom:"Alain Corbin", identite:"Historien français (né en 1936)", courant:"Histoire des sensibilités, « histoire au ras du sol »", oeuvre:"Les Cloches de la terre (1994)", terrain:"Campagnes françaises du XIXe siècle (Orne, Limousin)", conceptCard:"Histoire au ras du sol", theseCard:"La campagne a une épaisseur culturelle et sensorielle propre — sons, odeurs, honneur — pas seulement des structures économiques.", theseFull:"Restitue l'univers d'un sabotier analphabète n'ayant laissé aucune archive personnelle pour prouver que la campagne a une épaisseur culturelle et sensorielle propre (sons, rumeurs, odeurs, honneur, religion), pas seulement des structures économiques.", remarqueLabel:"Limites", remarque:"Méthode difficile à généraliser au-delà des cas très documentés qu'il choisit."},
+  {id:"c_mayaud", question:"campagne", nom:"Jean-Luc Mayaud", identite:"Historien français contemporain, histoire agraire", courant:"Histoire agraire, systèmes de production", oeuvre:"La Petite Exploitation rurale triomphante (1999)", terrain:"France rurale, XIXe siècle", conceptCard:"Petite exploitation triomphante", theseCard:"Contre le cliché de l'arriération, la petite propriété familiale était un système économique résilient et innovant.", theseFull:"Contre le cliché de l'arriération routinière des campagnes, il montre que la petite propriété familiale était un système économique résilient, innovant à son échelle et adapté aux contraintes du marché intérieur.", remarqueLabel:"Limites", remarque:"Ancrage empirique fort dans le Doubs/Jura ; généralisation nationale à étayer."},
+  {id:"c_moriceau", question:"campagne", nom:"Jean-Marc Moriceau", identite:"Historien français contemporain, histoire agraire", courant:"Histoire agraire, systèmes de production", oeuvre:"Terres mouvantes (2002)", terrain:"France rurale, longue durée", conceptCard:"Systèmes agraires régionaux", theseCard:"L'évolution des campagnes doit s'analyser à travers la diversité régionale des systèmes agraires plutôt qu'un récit national unique.", theseFull:"L'évolution des campagnes françaises doit s'analyser à travers la diversité régionale des systèmes agraires (openfield, bocage, polyculture méridionale) et leurs rythmes propres de modernisation, plutôt qu'à travers un récit national unique.", remarqueLabel:"Limites", remarque:"Approche parfois très typologique, moins centrée sur le vécu subjectif que Corbin ou Agulhon."},
+  {id:"c_lagrave", question:"campagne", nom:"Lagrave &amp; Moulin", identite:"Sociologue et historienne françaises contemporaines", courant:"Sociologie rurale, histoire sociale, genre", oeuvre:"Celles de la terre (1987) / Les Paysans dans la société française (1988)", terrain:"Monde paysan du XXe siècle", conceptCard:"Rapports de genre en agriculture", theseCard:"La modernisation agricole transforme les rapports de genre, souvent au détriment du statut des agricultrices.", theseFull:"La modernisation agricole du XXe siècle transforme profondément les rapports de genre dans l'exploitation familiale, souvent au détriment du statut des femmes, longtemps invisibilisées dans le travail agricole.", remarqueLabel:"Limites", remarque:"Corpus centré sur le XXe siècle, moins mobilisable pour la première moitié du XIXe siècle."}
+];
+
+const DUELS = [
+  {id:"d_sante", question:"sante", sujet:"Comment expliquer les inégalités d'accès aux soins en France aujourd'hui ?", optionIds:["s_sorre","s_vigneron","s_salem","s_hoyez"], correctIds:["s_vigneron","s_hoyez"], explication:"Vigneron éclaire la dimension institutionnelle : l'aménagement sanitaire (répartition des hôpitaux, des médecins) est un choix politique. Hoyez &amp; Gasquez-Blanchard révèlent la dimension sociale et vécue : l'accès aux soins varie selon le genre, l'origine et le parcours de vie. Les deux angles — structurel et expérientiel — se complètent."},
+  {id:"d_etat", question:"etat", sujet:"L'État est-il toujours l'acteur central de l'organisation de l'espace mondial ?", optionIds:["e_levy","e_raffestin","e_foucher","e_brenner"], correctIds:["e_levy","e_foucher"], explication:"Lévy relativise l'État, simple « acteur spatial peu pensé » parmi d'autres (firmes, ONG). Foucher réaffirme au contraire sa centralité : l'État ne cesse de produire de nouvelles frontières, acte ultime de sa souveraineté. Une tension classique à exploiter en dissertation."},
+  {id:"d_france", question:"france", sujet:"Le « millefeuille » territorial français profite-t-il aux campagnes ?", optionIds:["f_vanier","f_davezies","f_jousseaume"], correctIds:["f_vanier","f_davezies"], explication:"Vanier montre que le découpage administratif est périmé face aux flux et propose de penser l'interterritorialité. Davezies montre que c'est l'économie présentielle, redistribuée par l'État, qui irrigue concrètement les territoires non métropolitains. Deux mécanismes complémentaires de correction de la fracture territoriale."},
+  {id:"d_pacifique", question:"pacifique", sujet:"Le Pacifique est-il un espace fragmenté par l'isolement insulaire ?", optionIds:["p_hauofa","p_bonnemaison","p_duvat","p_grataloup"], correctIds:["p_hauofa","p_grataloup"], explication:"Hau'Ofa décentre le regard occidental et montre un océan qui relie, une « mer d'îles ». Grataloup &amp; Blais historicisent ce même regard occidental et montrent que le découpage en sous-régions isolées (Mélanésie, Micronésie…) est une construction coloniale arbitraire. Deux façons convergentes de déconstruire le mythe de l'isolement."},
+  {id:"d_ameriques", question:"ameriques", sujet:"Faut-il privilégier une histoire quantitative ou une histoire depuis les vaincus pour comprendre la conquête des Amériques ?", optionIds:["a_elliott","a_wachtel","a_chaunu","a_gruzinski"], correctIds:["a_wachtel","a_chaunu"], explication:"Chaunu privilégie les courbes de trafic et les cycles économiques mesurables (histoire sérielle). Wachtel restitue au contraire le vécu et les représentations des sociétés amérindiennes elles-mêmes (vision des vaincus). Deux méthodes historiographiques en tension féconde, explicitement suggérée par le corpus."},
+  {id:"d_campagne", question:"campagne", sujet:"La politisation des campagnes françaises doit-elle sa réussite à l'école républicaine ?", optionIds:["c_weber","c_agulhon","c_corbin","c_mendras"], correctIds:["c_weber","c_agulhon"], explication:"Weber attribue l'intégration nationale et politique à l'école, l'armée et le rail — un processus tardif venu d'en haut. Agulhon montre au contraire une politisation précoce par le bas, via les sociabilités villageoises (cafés, cercles), bien avant Jules Ferry. Le débat classique à mobiliser en couple."}
+];
+
+/* ========================================================================
+   UTILITAIRES
+======================================================================== */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+function chunk(arr, size){
+  const out = [];
+  for(let i=0;i<arr.length;i+=size) out.push(arr.slice(i,i+size));
+  return out;
+}
+function byId(id){ return AUTEURS.find(a=>a.id===id); }
+function questionInfo(qid){ return QUESTIONS.find(q=>q.id===qid); }
+function livesHtml(n){ return "❤️".repeat(Math.max(n,0)) + "🖤".repeat(Math.max(3-n,0)); }
+function toast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.remove("hidden");
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(()=>t.classList.add("hidden"), 1800);
+}
+
+/* ========================================================================
+   ÉTAT GLOBAL & NAVIGATION
+======================================================================== */
+const state = {
+  questionId: null,
+  pool: [],
+  lastMode: null
+};
+
+function showScreen(id){
+  document.querySelectorAll("body > div[id^='screen-']").forEach(s => s.classList.add("hidden"));
+  document.getElementById(id).classList.remove("hidden");
+  if(id === "screen-questions") renderQuestions();
+}
+
+function renderQuestions(){
+  const container = document.getElementById("questions-container");
+  container.innerHTML = "";
+  QUESTIONS.forEach(q=>{
+    const count = AUTEURS.filter(a=>a.question===q.id).length;
+    const card = document.createElement("div");
+    card.className = "data-card";
+    card.tabIndex = 0;
+    card.innerHTML = `<div class="tab" style="background:${q.color};"></div>
+      <div class="card-body">
+        <div class="card-title">${q.nom}</div>
+        <div class="card-count">${count} auteur${count>1?"s":""}</div>
+      </div>`;
+    card.onclick = () => selectQuestion(q.id);
+    container.appendChild(card);
+  });
+  // carte "toutes"
+  const all = document.createElement("div");
+  all.className = "data-card";
+  all.tabIndex = 0;
+  all.innerHTML = `<div class="tab" style="background:var(--q-toutes);"></div>
+    <div class="card-body">
+      <div class="card-title">Bilan général</div>
+      <div class="card-meta">Toutes les questions mélangées</div>
+      <div class="card-count">${AUTEURS.length} auteurs</div>
+    </div>`;
+  all.onclick = () => selectQuestion("toutes");
+  container.appendChild(all);
+}
+
+function selectQuestion(qid){
+  state.questionId = qid;
+  state.pool = qid === "toutes" ? AUTEURS.slice() : AUTEURS.filter(a=>a.question===qid);
+  const label = qid === "toutes" ? "Bilan général" : questionInfo(qid).nom;
+  document.getElementById("modes-title").textContent = label;
+  showScreen("screen-modes");
+}
+
+function startMode(mode){
+  if(mode === "decouverte") initDecouverte();
+  if(mode === "association") initAssociation();
+  if(mode === "quisuisje") initQSJ();
+  if(mode === "duel") initDuel();
+}
+
+function quitGame(){
+  if(confirm("Quitter la partie en cours ? Votre progression sera perdue.")){
+    showScreen("screen-modes");
+  }
+}
+
+function replayLast(){
+  if(state.lastMode) startMode(state.lastMode);
+}
+
+/* ========================================================================
+   DÉCOUVERTE
+======================================================================== */
+function initDecouverte(){
+  showScreen("screen-decouverte");
+  document.getElementById("discover-count").textContent = state.pool.length + " fiche(s)";
+  const container = document.getElementById("discover-container");
+  container.innerHTML = "";
+  state.pool.forEach(a=>{
+    const q = questionInfo(a.question);
+    const card = document.createElement("div");
+    card.className = "data-card";
+    card.tabIndex = 0;
+    card.innerHTML = `<div class="tab" style="background:${q.color};"></div>
+      <div class="card-body">
+        <div class="card-title">${a.nom}</div>
+        <div class="card-meta">${a.identite}</div>
+        <div class="concept-tag">${a.conceptCard}</div>
+      </div>`;
+    card.onclick = () => openModal(a.id);
+    container.appendChild(card);
+  });
+}
+
+/* ========================================================================
+   ASSOCIATION
+======================================================================== */
+let assoc = null;
+
+function initAssociation(){
+  state.lastMode = "association";
+  const pool = shuffle(state.pool);
+  assoc = {
+    batches: chunk(pool, 4),
+    batchIndex: 0,
+    phase: "concept", // "concept" -> "these"
+    score: 0,
+    lives: 3,
+    selected: null,
+    matched: new Set()
+  };
+  showScreen("screen-association");
+  renderAssociation();
+}
+
+function currentAssocBatch(){ return assoc.batches[assoc.batchIndex]; }
+
+function renderAssociation(){
+  document.getElementById("assoc-score").textContent = assoc.score + " pts";
+  document.getElementById("assoc-lives").innerHTML = livesHtml(assoc.lives);
+  document.getElementById("assoc-progress").textContent = "Lot " + (assoc.batchIndex+1) + "/" + assoc.batches.length;
+  document.getElementById("assoc-right-label").textContent = assoc.phase === "concept" ? "Concepts clés" : "Thèses principales";
+  document.getElementById("assoc-instruction").textContent = assoc.phase === "concept"
+    ? "Touchez un auteur, puis touchez son concept clé."
+    : "Touchez un auteur, puis touchez sa thèse principale.";
+
+  const batch = currentAssocBatch();
+  const left = document.getElementById("assoc-left");
+  const right = document.getElementById("assoc-right");
+  left.innerHTML = "";
+  right.innerHTML = "";
+
+  batch.forEach(a=>{
+    const isMatched = assoc.matched.has(a.id);
+    const btn = document.createElement("button");
+    btn.className = "opt-btn" + (isMatched ? " matched" : "") + (assoc.selected===a.id ? " selected" : "");
+    btn.textContent = a.nom;
+    btn.disabled = isMatched;
+    btn.dataset.id = a.id;
+    btn.onclick = () => selectAssocAuteur(a.id);
+    left.appendChild(btn);
+  });
+
+  const rightItems = shuffle(batch);
+  rightItems.forEach(a=>{
+    const isMatched = assoc.matched.has(a.id);
+    const btn = document.createElement("button");
+    btn.className = "opt-btn" + (isMatched ? " matched" : "");
+    btn.textContent = assoc.phase === "concept" ? a.conceptCard : a.theseCard;
+    btn.disabled = isMatched;
+    btn.dataset.id = a.id;
+    btn.onclick = () => checkAssocMatch(a.id, btn);
+    right.appendChild(btn);
+  });
+}
+
+function selectAssocAuteur(id){
+  if(assoc.matched.has(id)) return;
+  assoc.selected = (assoc.selected === id) ? null : id;
+  renderAssociation();
+}
+
+function checkAssocMatch(optionAuteurId, btnEl){
+  if(!assoc.selected){
+    toast("Touchez d'abord un auteur à gauche.");
+    return;
+  }
+  const leftBtn = document.querySelector('#assoc-left button[data-id="'+assoc.selected+'"]');
+  if(optionAuteurId === assoc.selected){
+    assoc.matched.add(optionAuteurId);
+    assoc.score += 10;
+    if(leftBtn) leftBtn.classList.add("correct");
+    btnEl.classList.add("correct");
+    assoc.selected = null;
+    setTimeout(()=>{
+      const batch = currentAssocBatch();
+      const allMatched = batch.every(a=>assoc.matched.has(a.id));
+      if(allMatched){
+        if(assoc.phase === "concept"){
+          assoc.phase = "these";
+          assoc.matched = new Set();
+        } else {
+          assoc.batchIndex++;
+          if(assoc.batchIndex >= assoc.batches.length){
+            endGame("association", true, "Vous avez relié tous les auteurs à leur concept et à leur thèse.");
+            return;
+          }
+          assoc.phase = "concept";
+          assoc.matched = new Set();
+        }
+      }
+      renderAssociation();
+    }, 350);
+  } else {
+    if(leftBtn) leftBtn.classList.add("wrong");
+    btnEl.classList.add("wrong");
+    assoc.lives--;
+    assoc.selected = null;
+    setTimeout(()=>{
+      if(assoc.lives <= 0){
+        endGame("association", false, "Plus de vies. Consultez la Découverte pour revoir ces fiches avant de réessayer.");
+        return;
+      }
+      renderAssociation();
+    }, 450);
+  }
+}
+
+/* ========================================================================
+   QUI SUIS-JE ?
+======================================================================== */
+let qsj = null;
+
+function initQSJ(){
+  state.lastMode = "quisuisje";
+  qsj = {
+    pool: shuffle(state.pool),
+    index: 0,
+    score: 0,
+    lives: 3,
+    cluesRevealed: 1,
+    clues: [],
+    options: [],
+    answered: false
+  };
+  showScreen("screen-quisuisje");
+  nextQSJ();
+}
+
+function nextQSJ(){
+  if(qsj.index >= qsj.pool.length){
+    endGame("quisuisje", true, "Vous avez identifié tous les auteurs de cette fiche.");
+    return;
+  }
+  const a = qsj.pool[qsj.index];
+  qsj.cluesRevealed = 1;
+  qsj.answered = false;
+  const firstWords = a.theseCard.split(" ").slice(0,10).join(" ");
+  qsj.clues = [
+    {label:"Terrain", text:a.terrain},
+    {label:"Concept clé", text:a.conceptCard},
+    {label:"Fragment de thèse", text:firstWords + "…"},
+    {label:"Œuvre phare", text:a.oeuvre.replace(/\s*\(\d{4}.*\)/,"")}
+  ];
+  const others = state.pool.filter(x=>x.id!==a.id);
+  const distractors = shuffle(others).slice(0, Math.min(3, others.length));
+  qsj.options = shuffle([a, ...distractors]).map(x=>x.id);
+  renderQSJ();
+}
+
+function renderQSJ(){
+  document.getElementById("qsj-score").textContent = qsj.score + " pts";
+  document.getElementById("qsj-lives").innerHTML = livesHtml(qsj.lives);
+  document.getElementById("qsj-progress").textContent = (qsj.index+1) + "/" + qsj.pool.length;
+
+  const cluesEl = document.getElementById("qsj-clues");
+  cluesEl.innerHTML = "";
+  for(let i=0;i<qsj.cluesRevealed;i++){
+    const c = qsj.clues[i];
+    const div = document.createElement("div");
+    div.className = "clue-item";
+    div.innerHTML = `<span class="clue-label">${c.label}</span>${c.text}`;
+    cluesEl.appendChild(div);
+  }
+
+  const nextBtn = document.getElementById("qsj-next-clue");
+  nextBtn.classList.toggle("hidden", qsj.cluesRevealed >= qsj.clues.length || qsj.answered);
+
+  const optsEl = document.getElementById("qsj-options");
+  optsEl.innerHTML = "";
+  const correctId = qsj.pool[qsj.index].id;
+  qsj.options.forEach(id=>{
+    const a = byId(id);
+    const btn = document.createElement("button");
+    btn.className = "qcm-btn";
+    btn.textContent = a.nom;
+    btn.disabled = qsj.answered;
+    btn.onclick = () => answerQSJ(id, btn, correctId);
+    optsEl.appendChild(btn);
+  });
+}
+
+function revealNextClueQSJ(){
+  if(qsj.cluesRevealed < qsj.clues.length){
+    qsj.cluesRevealed++;
+    renderQSJ();
+  }
+}
+
+function answerQSJ(chosenId, btnEl, correctId){
+  if(qsj.answered) return;
+  if(chosenId === correctId){
+    qsj.answered = true;
+    const pts = [100,75,50,25][qsj.cluesRevealed-1] || 25;
+    qsj.score += pts;
+    btnEl.classList.add("correct");
+    toast("+" + pts + " points");
+    setTimeout(()=>{ qsj.index++; nextQSJ(); }, 850);
+  } else {
+    btnEl.classList.add("wrong");
+    qsj.lives--;
+    if(qsj.lives <= 0){
+      qsj.answered = true;
+      setTimeout(()=>{ endGame("quisuisje", false, "Plus de vies. La bonne réponse était : " + byId(correctId).nom + "."); }, 500);
+      return;
+    }
+    if(qsj.cluesRevealed < qsj.clues.length){
+      qsj.cluesRevealed++;
+      setTimeout(renderQSJ, 500);
+    } else {
+      qsj.answered = true;
+      toast("Réponse : " + byId(correctId).nom);
+      setTimeout(()=>{ qsj.index++; nextQSJ(); }, 1200);
+    }
+  }
+}
+
+/* ========================================================================
+   DUEL HISTORIOGRAPHIQUE
+======================================================================== */
+let duel = null;
+
+function initDuel(){
+  state.lastMode = "duel";
+  const relevant = DUELS.filter(d => state.questionId === "toutes" || d.question === state.questionId);
+  if(relevant.length === 0){
+    toast("Pas encore de duel pour cette fiche.");
+    showScreen("screen-modes");
+    return;
+  }
+  duel = {
+    list: shuffle(relevant),
+    index: 0,
+    score: 0,
+    selected: []
+  };
+  showScreen("screen-duel");
+  renderDuelRound();
+}
+
+function renderDuelRound(){
+  const d = duel.list[duel.index];
+  duel.selected = [];
+  document.getElementById("duel-score").textContent = duel.score + " pts";
+  document.getElementById("duel-progress").textContent = "Manche " + (duel.index+1) + "/" + duel.list.length;
+  document.getElementById("duel-sujet").textContent = d.sujet;
+  document.getElementById("duel-feedback").classList.add("hidden");
+  document.getElementById("duel-next").classList.add("hidden");
+  document.getElementById("duel-validate").classList.remove("hidden");
+  document.getElementById("duel-validate").disabled = true;
+
+  const chipsEl = document.getElementById("duel-chips");
+  chipsEl.innerHTML = "";
+  d.optionIds.forEach(id=>{
+    const a = byId(id);
+    const chip = document.createElement("button");
+    chip.className = "chip";
+    chip.textContent = a.nom;
+    chip.tabIndex = 0;
+    chip.onclick = () => toggleDuelChip(id, chip);
+    chipsEl.appendChild(chip);
+  });
+}
+
+function toggleDuelChip(id, chipEl){
+  const idx = duel.selected.indexOf(id);
+  if(idx >= 0){
+    duel.selected.splice(idx,1);
+    chipEl.classList.remove("on");
+  } else if(duel.selected.length < 2){
+    duel.selected.push(id);
+    chipEl.classList.add("on");
+  }
+  document.getElementById("duel-validate").disabled = duel.selected.length !== 2;
+}
+
+function validateDuel(){
+  const d = duel.list[duel.index];
+  const correctCount = duel.selected.filter(id => d.correctIds.includes(id)).length;
+  const pts = correctCount === 2 ? 100 : (correctCount === 1 ? 40 : 0);
+  duel.score += pts;
+
+  const verdictEl = document.getElementById("duel-verdict");
+  if(correctCount === 2){
+    verdictEl.textContent = "Duo parfaitement mobilisé (+100 pts)";
+    verdictEl.className = "feedback-verdict ok";
+  } else if(correctCount === 1){
+    verdictEl.textContent = "À moitié dans le mille (+40 pts)";
+    verdictEl.className = "feedback-verdict half";
+  } else {
+    verdictEl.textContent = "Piste à retravailler (+0 pt)";
+    verdictEl.className = "feedback-verdict no";
+  }
+  const correctNames = d.correctIds.map(id=>byId(id).nom).join(" &amp; ");
+  document.getElementById("duel-explain").innerHTML = "<strong>Couple attendu : " + correctNames + ".</strong><br>" + d.explication;
+
+  document.getElementById("duel-feedback").classList.remove("hidden");
+  document.getElementById("duel-validate").classList.add("hidden");
+  document.getElementById("duel-score").textContent = duel.score + " pts";
+
+  const isLast = duel.index >= duel.list.length - 1;
+  const nextBtn = document.getElementById("duel-next");
+  nextBtn.textContent = isLast ? "Voir mon score" : "Manche suivante";
+  nextBtn.classList.remove("hidden");
+}
+
+function nextDuelRound(){
+  duel.index++;
+  if(duel.index >= duel.list.length){
+    endGame("duel", true, "Vous avez parcouru tous les duels disponibles pour cette sélection.");
+    return;
+  }
+  renderDuelRound();
+}
+
+/* ========================================================================
+   FIN DE PARTIE
+======================================================================== */
+function endGame(mode, success, message){
+  showScreen("screen-end");
+  const titles = {
+    association: success ? "Lot terminé !" : "Partie interrompue",
+    quisuisje: success ? "Fichier bouclé !" : "Partie interrompue",
+    duel: "Duels terminés"
+  };
+  const scores = {association: assoc ? assoc.score : 0, quisuisje: qsj ? qsj.score : 0, duel: duel ? duel.score : 0};
+  document.getElementById("end-title").textContent = titles[mode] || "Terminé";
+  document.getElementById("end-score-val").textContent = scores[mode] || 0;
+  document.getElementById("end-msg").textContent = message || "";
+}
+
+/* ========================================================================
+   MODAL FICHE
+======================================================================== */
+function openModal(id){
+  const a = byId(id);
+  const q = questionInfo(a.question);
+  document.getElementById("modal-tag").textContent = a.horsProgramme ? "Hors programme · concept utile" : q.nom;
+  document.getElementById("modal-tag").style.background = q.color;
+  document.getElementById("modal-nom").innerHTML = a.nom;
+  document.getElementById("modal-meta").textContent = a.identite + " — " + a.courant;
+  document.getElementById("modal-terrain").textContent = a.terrain;
+  document.getElementById("modal-concept").textContent = a.conceptCard;
+  document.getElementById("modal-these").textContent = a.theseFull;
+  document.getElementById("modal-oeuvre").textContent = a.oeuvre;
+
+  const citWrap = document.getElementById("modal-citation-wrap");
+  if(a.citation){
+    citWrap.classList.remove("hidden");
+    document.getElementById("modal-citation").textContent = a.citation;
+  } else {
+    citWrap.classList.add("hidden");
+  }
+
+  const remWrap = document.getElementById("modal-remarque-wrap");
+  if(a.remarque){
+    remWrap.classList.remove("hidden");
+    document.getElementById("modal-remarque-label").textContent = a.remarqueLabel || "Limites";
+    document.getElementById("modal-remarque").textContent = a.remarque;
+  } else {
+    remWrap.classList.add("hidden");
+  }
+
+  document.getElementById("modal-fiche").classList.remove("hidden");
+}
+function closeModal(){
+  document.getElementById("modal-fiche").classList.add("hidden");
+}
+
+window.onload = () => showScreen("screen-home");
+</script>
+</body>
+</html>
