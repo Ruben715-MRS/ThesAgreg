@@ -33,7 +33,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font-body);height:1
 @media (prefers-reduced-motion: reduce){ *{transition:none !important; animation:none !important;} }
 
 button{font-family:var(--font-body); cursor:pointer;}
-button:focus-visible, .chip:focus-visible, .data-card:focus-visible{outline:3px solid var(--gold); outline-offset:2px;}
+button:focus-visible, .chip:focus-visible, .data-card:focus-visible, #screen-home:focus-visible{outline:3px solid var(--gold); outline-offset:2px;}
 
 .btn{background:var(--accent);color:#fff;border:none;padding:13px 24px;border-radius:8px;font-size:16px;font-weight:600;transition:opacity .2s, transform .15s;}
 .btn:hover{opacity:.88;}
@@ -41,12 +41,19 @@ button:focus-visible, .chip:focus-visible, .data-card:focus-visible{outline:3px 
 .btn.ghost{background:#00000012;color:var(--ink);}
 .btn:disabled{opacity:.4;cursor:not-allowed;}
 
-/* ===== HOME ===== */
-#screen-home{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;}
-.logo{font-family:var(--font-display);font-size:46px;font-weight:700;color:var(--ink);letter-spacing:-0.5px;}
-.logo span{color:var(--accent);}
-.subtitle{font-family:var(--font-body);font-size:16px;color:var(--ink-soft);margin:8px 0 36px;max-width:340px;}
-.home-stamp{font-family:var(--font-mono);font-size:11px;letter-spacing:1.5px;color:var(--gold);text-transform:uppercase;border:1px solid var(--gold);padding:4px 10px;border-radius:20px;margin-bottom:26px;}
+/* ===== HOME (Mise à jour avec l'image) ===== */
+#screen-home{
+  flex:1;
+  background-image: url('accueil.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+#screen-home:active {
+  transform: scale(0.99); /* Petit effet de clic sur toute l'image */
+}
 
 /* ===== TOP BAR (shared) ===== */
 .top-bar{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--card);box-shadow:var(--shadow);flex-shrink:0;z-index:5;}
@@ -149,12 +156,9 @@ button:focus-visible, .chip:focus-visible, .data-card:focus-visible{outline:3px 
 </head>
 <body>
 
-<!-- ACCUEIL -->
-<div id="screen-home">
-  <div class="home-stamp">Agrégation externe de géographie</div>
-  <div class="logo">Thes<span>Agreg</span></div>
-  <div class="subtitle">Le fichier des auteurs, concepts &amp; thèses du programme.</div>
-  <button class="btn" onclick="showScreen('screen-questions')">Ouvrir le fichier</button>
+<!-- ACCUEIL : Transformé en bouton géant avec l'image en fond -->
+<div id="screen-home" role="button" aria-label="Commencer l'aventure" tabindex="0" onclick="showScreen('screen-questions')" onkeydown="if(event.key==='Enter') showScreen('screen-questions')">
+  <!-- L'image de fond gère désormais tout le visuel de l'accueil -->
 </div>
 
 <!-- CHOIX DE LA QUESTION -->
