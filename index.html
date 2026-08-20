@@ -68,7 +68,7 @@ button:focus-visible, .chip:focus-visible, .data-card:focus-visible, #screen-hom
 .list-screen{flex:1;padding:22px 18px 40px;overflow-y:auto;display:flex;flex-direction:column;align-items:center;}
 .header-title{font-family:var(--font-display);font-size:24px;margin:6px 0 6px;text-align:center;}
 .header-sub{font-size:14px;color:var(--ink-soft);margin-bottom:22px;text-align:center;max-width:420px;}
-.grid-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;width:100%;max-width:1000px;}
+.grid-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));grid-auto-rows:min-content;gap:16px;width:100%;max-width:1000px;}
 
 /* fiche / index-card look */
 .data-card{background:var(--card);border-radius:4px 10px 10px 10px;overflow:hidden;box-shadow:var(--shadow);cursor:pointer;transition:transform .15s;position:relative;border:1px solid #00000010;}
@@ -90,13 +90,16 @@ button:focus-visible, .chip:focus-visible, .data-card:focus-visible, #screen-hom
 .mode-tag{display:inline-block;font-family:var(--font-mono);font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
 
 /* ===== DECOUVERTE ===== */
-#screen-decouverte{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+#screen-decouverte{flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0;}
 .discover-grid {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   padding: 18px;
   display: grid;
   grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+  grid-auto-rows: min-content;
   align-content: start;
   gap: 14px;
   max-width: 1000px;
