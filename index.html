@@ -4,199 +4,332 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>ThesAgreg — Auteurs, thèses &amp; vocabulaire</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#EAE2D0;
-  --card:#FBF8F1;
-  --ink:#26314D;
-  --ink-soft:#5A6482;
-  --accent:#8C3B4A;
-  --accent-soft:#C98A96;
-  --gold:#B98A2E;
-  --success:#3F7A5C;
-  --danger:#B23A32;
-  --shadow:0 4px 10px rgba(38,49,77,0.10);
-  --font-display: Georgia, "Iowan Old Style", "Palatino Linotype", "Times New Roman", serif;
-  --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  --q-sante:#4E7D6F;
-  --q-etat:#3A4E7A;
-  --q-france:#8C3B4A;
-  --q-pacifique:#2E8C8C;
-  --q-ameriques:#A9552B;
-  --q-campagne:#6B8C3A;
-  --q-toutes:#5A5248;
+  /* ---- Palette : cabinet d'étude — parchemin, encre profonde, bordeaux, or ancien ---- */
+  --bg:#EEE4D1;
+  --bg-deep:#E4D6BC;
+  --card:#FBF7EE;
+  --card-alt:#F5EEDF;
+  --ink:#20293F;
+  --ink-soft:#57617A;
+  --ink-faint:#8A8F9E;
+  --line:rgba(32,41,63,0.14);
+  --line-soft:rgba(32,41,63,0.08);
+  --accent:#77293A;
+  --accent-soft:#C79BA3;
+  --accent-wash:rgba(119,41,58,0.08);
+  --gold:#9C7422;
+  --gold-soft:rgba(156,116,34,0.14);
+  --success:#33654A;
+  --success-wash:rgba(51,101,74,0.10);
+  --danger:#9B3A2E;
+  --danger-wash:rgba(155,58,46,0.10);
+
+  --radius-sm:8px;
+  --radius-md:12px;
+  --radius-lg:18px;
+
+  --shadow-sm:0 1px 2px rgba(24,20,10,.07), 0 1px 1px rgba(24,20,10,.05);
+  --shadow-md:0 10px 22px -8px rgba(24,20,10,.22), 0 3px 8px -2px rgba(24,20,10,.10);
+  --shadow-lg:0 26px 54px -16px rgba(24,20,10,.34), 0 10px 24px -10px rgba(24,20,10,.18);
+  --shadow:var(--shadow-sm); /* rétro-compatibilité */
+
+  --font-display: "Fraunces", Georgia, "Iowan Old Style", "Palatino Linotype", "Times New Roman", serif;
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --q-sante:#3E6E5F;
+  --q-etat:#31456E;
+  --q-france:#77293A;
+  --q-pacifique:#1F6E6E;
+  --q-ameriques:#8E4A22;
+  --q-campagne:#5A7429;
+  --q-toutes:#4B4335;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
-body{background:var(--bg);color:var(--ink);font-family:var(--font-body);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+html{-webkit-text-size-adjust:100%;}
+body{
+  background:
+    radial-gradient(1100px 620px at 12% -8%, rgba(255,255,255,.45), transparent 60%),
+    radial-gradient(900px 700px at 105% 10%, rgba(255,255,255,.28), transparent 55%),
+    linear-gradient(175deg, var(--bg) 0%, var(--bg-deep) 100%);
+  color:var(--ink);
+  font-family:var(--font-body);
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
 .hidden{display:none !important;}
 @media (prefers-reduced-motion: reduce){ *{transition:none !important; animation:none !important;} }
 
+::selection{ background:var(--gold); color:#fff; }
+::-webkit-scrollbar{width:11px;height:11px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(32,41,63,.18);border-radius:20px;border:3px solid transparent;background-clip:padding-box;}
+::-webkit-scrollbar-thumb:hover{background:rgba(32,41,63,.30);background-clip:padding-box;}
+
 button{font-family:var(--font-body); cursor:pointer;}
-button:focus-visible, .chip:focus-visible, .data-card:focus-visible, #screen-home:focus-visible{outline:3px solid var(--gold); outline-offset:2px;}
+button:focus-visible, .chip:focus-visible, .data-card:focus-visible, .mode-card:focus-visible, #screen-home:focus-visible{outline:2.5px solid var(--gold); outline-offset:3px; border-radius:4px;}
 
-.btn{background:var(--accent);color:#fff;border:none;padding:13px 24px;border-radius:8px;font-size:16px;font-weight:600;transition:opacity .2s, transform .15s;}
-.btn:hover{opacity:.88;}
-.btn:active{transform:scale(.98);}
-.btn.ghost{background:#00000012;color:var(--ink);}
-.btn:disabled{opacity:.4;cursor:not-allowed;}
+/* Transition d'entrée des écrans */
+@keyframes screenIn{
+  from{ opacity:0; transform:translateY(8px); }
+  to{ opacity:1; transform:translateY(0); }
+}
+body > div[id^="screen-"]:not(.hidden){ animation:screenIn .38s cubic-bezier(.22,.8,.28,1) both; }
 
-/* ===== HOME (Mise à jour avec l'image) ===== */
+.btn{
+  background:var(--accent);
+  color:#FBF7EE;
+  border:1px solid rgba(0,0,0,.08);
+  padding:13px 26px;
+  border-radius:var(--radius-sm);
+  font-size:15px;
+  font-weight:600;
+  letter-spacing:.15px;
+  font-family:var(--font-body);
+  box-shadow:var(--shadow-sm), inset 0 1px 0 rgba(255,255,255,.10);
+  transition:transform .15s ease, box-shadow .15s ease, background-color .15s ease;
+}
+.btn:hover{ box-shadow:var(--shadow-md), inset 0 1px 0 rgba(255,255,255,.12); transform:translateY(-1px); }
+.btn:active{ transform:translateY(0) scale(.98); box-shadow:var(--shadow-sm); }
+.btn.ghost{ background:transparent; color:var(--ink); border:1px solid var(--line); box-shadow:none; }
+.btn.ghost:hover{ background:rgba(32,41,63,.05); border-color:rgba(32,41,63,.28); transform:translateY(-1px); box-shadow:none; }
+.btn:disabled{ opacity:.4; cursor:not-allowed; transform:none !important; box-shadow:var(--shadow-sm) !important; }
+
+/* ===== HOME (image d'accueil) ===== */
 #screen-home{
   flex:1;
+  position:relative;
+  background-color:var(--bg-deep);
   background-image: url('accueil.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   cursor: pointer;
-  transition: transform 0.1s;
+  transition: transform .2s ease, filter .2s ease;
 }
-#screen-home:active {
-  transform: scale(0.99); /* Petit effet de clic sur toute l'image */
+#screen-home:hover{ filter:brightness(1.02); }
+#screen-home:active { transform: scale(0.99); }
+.home-caption{
+  position:absolute;
+  left:0; right:0; bottom:0;
+  padding:10px 16px calc(10px + env(safe-area-inset-bottom));
+  text-align:center;
+  background:linear-gradient(0deg, rgba(15,17,10,.62) 0%, rgba(15,17,10,0) 100%);
+  color:#F3E6C4;
+  font-family:var(--font-mono);
+  font-size:11px;
+  letter-spacing:1.6px;
+  text-transform:uppercase;
+  pointer-events:none;
 }
 
-/* ===== TOP BAR (shared) ===== */
-.top-bar{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--card);box-shadow:var(--shadow);flex-shrink:0;z-index:5;}
-.back-btn{font-size:15px;font-weight:600;color:var(--ink-soft);cursor:pointer;padding:4px 6px;}
-.back-btn:hover{color:var(--ink);}
+/* ===== TOP BAR (partagée) ===== */
+.top-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 18px;
+  background:var(--card);
+  border-bottom:1px solid var(--line);
+  box-shadow:var(--shadow-sm);
+  flex-shrink:0; z-index:5;
+}
+.back-btn{
+  font-size:14px; font-weight:600; color:var(--ink-soft); cursor:pointer;
+  padding:6px 8px; border-radius:6px; transition:color .15s, background-color .15s;
+  letter-spacing:.1px;
+}
+.back-btn:hover{ color:var(--ink); background:rgba(32,41,63,.05); }
 .hud{display:flex;align-items:center;gap:14px;font-size:14px;font-weight:600;}
-.hud .lives{letter-spacing:2px;}
-.hud .score-pill{background:var(--ink);color:#fff;padding:4px 10px;border-radius:20px;font-family:var(--font-mono);font-size:13px;}
-.hud .progress-pill{font-family:var(--font-mono);color:var(--ink-soft);font-size:13px;}
+.hud .lives{display:inline-flex;align-items:center;gap:5px;}
+.life-dot{width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:inset 0 0 0 1px rgba(0,0,0,.10);flex-shrink:0;}
+.life-dot.off{background:transparent;box-shadow:inset 0 0 0 1.5px var(--ink-faint);}
+.hud .score-pill{background:var(--ink);color:#F4EEDF;padding:5px 12px;border-radius:20px;font-family:var(--font-mono);font-size:12.5px;font-variant-numeric:tabular-nums;letter-spacing:.3px;}
+.hud .progress-pill{font-family:var(--font-mono);color:var(--ink-soft);font-size:12.5px;font-variant-numeric:tabular-nums;letter-spacing:.2px;}
 
-/* ===== LIST SCREENS ===== */
-.list-screen{flex:1;padding:22px 18px 40px;overflow-y:auto;display:flex;flex-direction:column;align-items:center;}
-.header-title{font-family:var(--font-display);font-size:24px;margin:6px 0 6px;text-align:center;}
-.header-sub{font-size:14px;color:var(--ink-soft);margin-bottom:22px;text-align:center;max-width:420px;}
-.grid-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;width:100%;max-width:1000px;}
+/* ===== ÉCRANS-LISTES ===== */
+.list-screen{flex:1;padding:30px 18px 44px;overflow-y:auto;display:flex;flex-direction:column;align-items:center;}
+.header-eyebrow{font-family:var(--font-mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;text-align:center;}
+.header-title{font-family:var(--font-display);font-weight:600;font-size:27px;margin:2px 0 8px;text-align:center;color:var(--ink);}
+.header-sub{font-size:14.5px;color:var(--ink-soft);margin-bottom:30px;text-align:center;max-width:440px;line-height:1.5;}
+.grid-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;width:100%;max-width:1020px;}
 
-/* fiche / index-card look */
-.data-card{background:var(--card);border-radius:4px 10px 10px 10px;overflow:hidden;box-shadow:var(--shadow);cursor:pointer;transition:transform .15s;position:relative;border:1px solid #00000010;}
-.data-card:hover{transform:translateY(-3px);}
-.tab{height:8px;width:100%;}
-.card-body{padding:16px 18px;}
-.card-title{font-family:var(--font-display);font-size:19px;font-weight:700;color:var(--ink);}
-.card-meta{font-size:13px;color:var(--ink-soft);margin-top:4px;}
-.card-count{font-family:var(--font-mono);font-size:12px;color:var(--gold);margin-top:10px;letter-spacing:.5px;}
-.reset-srs-btn{position:absolute;top:10px;right:12px;font-size:18px;color:var(--ink-soft);opacity:.7;padding:4px 7px;border-radius:50%;transition:background .15s, opacity .15s;}
-.reset-srs-btn:hover{opacity:1;background:#00000012;}
+/* fiche / carte-index */
+.data-card, .mode-card{
+  background:var(--card);
+  border-radius:3px var(--radius-md) var(--radius-md) var(--radius-md);
+  overflow:hidden;
+  box-shadow:var(--shadow-sm);
+  cursor:pointer;
+  transition:transform .18s ease, box-shadow .18s ease;
+  position:relative;
+  border:1px solid var(--line-soft);
+}
+.data-card:hover, .mode-card:hover{ transform:translateY(-3px); box-shadow:var(--shadow-md); }
+.data-card:active, .mode-card:active{ transform:translateY(-1px); }
+.tab{height:6px;width:100%;}
+.card-body{padding:18px 20px 20px;}
+.card-title{font-family:var(--font-display);font-size:19px;font-weight:600;color:var(--ink);line-height:1.25;}
+.card-meta{font-size:13px;color:var(--ink-soft);margin-top:5px;}
+.card-count{font-family:var(--font-mono);font-size:11.5px;color:var(--gold);margin-top:12px;letter-spacing:.4px;padding-top:10px;border-top:1px dashed var(--line);}
+.reset-srs-btn{
+  position:absolute;top:12px;right:14px;color:var(--ink-soft);opacity:.55;
+  width:26px;height:26px;display:flex;align-items:center;justify-content:center;
+  border-radius:50%;transition:background-color .15s, opacity .15s, color .15s;
+}
+.reset-srs-btn svg{width:14px;height:14px;}
+.reset-srs-btn:hover{opacity:1;background:rgba(32,41,63,.08);color:var(--ink);}
 
-/* mode cards */
-.grid-modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;width:100%;max-width:900px;}
-.mode-card{background:var(--card);border-radius:12px;padding:22px 20px;text-align:left;box-shadow:var(--shadow);cursor:pointer;transition:transform .15s;border-left:6px solid var(--accent);}
-.mode-card:hover{transform:translateY(-3px);}
-.mode-card h3{font-family:var(--font-display);font-size:20px;margin-bottom:6px;}
-.mode-card p{font-size:13.5px;color:var(--ink-soft);line-height:1.4;}
-.mode-tag{display:inline-block;font-family:var(--font-mono);font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+/* cartes de mode / catégorie : même langage visuel que .data-card + pastille de palier */
+.grid-modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;width:100%;max-width:920px;}
+.mode-card .card-body{padding-top:16px;}
+.mode-card h3{font-family:var(--font-display);font-size:20px;font-weight:600;margin:9px 0 7px;color:var(--ink);}
+.mode-card p{font-size:13.5px;color:var(--ink-soft);line-height:1.48;}
+.mode-tag{display:inline-block;font-family:var(--font-mono);font-size:10.5px;letter-spacing:1.3px;text-transform:uppercase;color:var(--gold);}
+.card-badge{
+  position:absolute; top:14px; right:16px;
+  width:30px;height:30px;border-radius:50%;
+  background:var(--card);
+  border:1.5px solid var(--line);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-display);font-weight:600;font-size:13px;color:var(--ink-soft);
+  box-shadow:var(--shadow-sm);
+}
 
-/* ===== DECOUVERTE ===== */
+/* ===== DÉCOUVERTE ===== */
 #screen-decouverte{flex:1;display:flex;flex-direction:column;overflow:hidden;}
 .discover-grid {
   flex: 1;
   overflow-y: auto;
-  padding: 18px;
+  padding: 20px 18px 34px;
   display: grid;
   grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
   align-content: start;
   gap: 14px;
-  max-width: 1000px;
+  max-width: 1020px;
   margin: 0 auto;
   width: 100%;
 }
-.concept-tag{display:inline-block;font-family:var(--font-mono);font-size:11.5px;background:#00000008;color:var(--ink-soft);padding:3px 8px;border-radius:5px;margin-top:8px;}
+.concept-tag{display:inline-block;font-family:var(--font-mono);font-size:11px;background:var(--gold-soft);color:var(--gold);padding:4px 9px;border-radius:5px;margin-top:10px;letter-spacing:.2px;}
+.card-def{font-size:13.5px;color:var(--ink-soft);line-height:1.55;margin-top:8px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
 
-/* ===== GAME SCREENS ===== */
-.game-body{flex:1;display:flex;flex-direction:column;overflow-y:auto;padding:18px;align-items:center;}
-.instruction{font-size:13.5px;color:var(--ink-soft);text-align:center;margin-bottom:16px;max-width:480px;}
+/* ===== ÉCRANS DE JEU ===== */
+.game-body{flex:1;display:flex;flex-direction:column;overflow-y:auto;padding:22px 18px 34px;align-items:center;}
+.instruction{font-size:13.5px;color:var(--ink-soft);text-align:center;margin-bottom:18px;max-width:480px;line-height:1.5;}
 
 /* association */
-.assoc-wrap{display:flex;gap:18px;width:100%;max-width:700px;flex-wrap:wrap;justify-content:center;}
+.assoc-wrap{display:flex;gap:20px;width:100%;max-width:700px;flex-wrap:wrap;justify-content:center;}
 .assoc-col{flex:1;min-width:260px;display:flex;flex-direction:column;gap:10px;}
-.assoc-col-label{font-family:var(--font-mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:2px;text-align:center;}
-.opt-btn{background:var(--card);border:2px solid #00000012;border-radius:10px;padding:13px 14px;font-size:14.5px;text-align:left;line-height:1.35;box-shadow:var(--shadow);transition:all .15s;color:var(--ink);}
-.opt-btn:hover:not(:disabled){border-color:var(--accent-soft);}
-.opt-btn.selected{border-color:var(--accent);background:#8C3B4A0F;}
-.opt-btn.correct{border-color:var(--success);background:#3F7A5C15;color:var(--success);}
-.opt-btn.wrong{border-color:var(--danger);background:#B23A3215;animation:shake .35s;}
+.assoc-col-label{font-family:var(--font-mono);font-size:10.5px;letter-spacing:1.4px;text-transform:uppercase;color:var(--gold);margin-bottom:4px;text-align:center;}
+.opt-btn{background:var(--card);border:1.5px solid var(--line);border-radius:var(--radius-sm);padding:13px 15px;font-size:14.5px;text-align:left;line-height:1.4;box-shadow:var(--shadow-sm);transition:border-color .15s, background-color .15s, transform .12s;color:var(--ink);font-family:var(--font-body);}
+.opt-btn:hover:not(:disabled){border-color:var(--accent-soft);transform:translateY(-1px);}
+.opt-btn.selected{border-color:var(--accent);background:var(--accent-wash);}
+.opt-btn.correct{border-color:var(--success);background:var(--success-wash);color:var(--success);}
+.opt-btn.wrong{border-color:var(--danger);background:var(--danger-wash);animation:shake .35s;}
 .opt-btn:disabled{cursor:default;}
-.opt-btn.matched{opacity:.45;}
+.opt-btn.matched{opacity:.4;}
 @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-5px);}75%{transform:translateX(5px);}}
 
 /* qui suis-je */
-.clue-panel{background:var(--card);border-radius:12px;box-shadow:var(--shadow);padding:20px;width:100%;max-width:520px;margin-bottom:18px;}
-.clue-item{font-size:15px;padding:8px 0;border-bottom:1px dashed #00000015;}
+.clue-panel{background:var(--card);border-radius:var(--radius-md);box-shadow:var(--shadow-sm);border:1px solid var(--line-soft);padding:20px 22px;width:100%;max-width:520px;margin-bottom:18px;}
+.clue-item{font-size:15px;padding:9px 0;border-bottom:1px dashed var(--line);line-height:1.45;}
 .clue-item:last-child{border-bottom:none;}
-.clue-label{font-family:var(--font-mono);font-size:10.5px;text-transform:uppercase;letter-spacing:1px;color:var(--gold);display:block;margin-bottom:2px;}
+.clue-label{font-family:var(--font-mono);font-size:10.5px;text-transform:uppercase;letter-spacing:1.2px;color:var(--gold);display:block;margin-bottom:3px;}
 .qcm-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:520px;}
 @media (max-width:480px){.qcm-grid{grid-template-columns:1fr;}}
-.qcm-btn{background:var(--card);border:2px solid #00000012;border-radius:10px;padding:14px;font-size:14.5px;font-weight:600;box-shadow:var(--shadow);color:var(--ink);}
-.qcm-btn.correct{border-color:var(--success);background:#3F7A5C15;color:var(--success);}
-.qcm-btn.wrong{border-color:var(--danger);background:#B23A3215;color:var(--danger);animation:shake .35s;}
+.qcm-btn{background:var(--card);border:1.5px solid var(--line);border-radius:var(--radius-sm);padding:14px;font-size:14.5px;font-weight:600;box-shadow:var(--shadow-sm);color:var(--ink);font-family:var(--font-body);transition:border-color .15s, background-color .15s, transform .12s;}
+.qcm-btn:hover:not(:disabled){border-color:var(--accent-soft);transform:translateY(-1px);}
+.qcm-btn.correct{border-color:var(--success);background:var(--success-wash);color:var(--success);}
+.qcm-btn.wrong{border-color:var(--danger);background:var(--danger-wash);color:var(--danger);animation:shake .35s;}
 
 /* duel */
-.duel-sujet{background:var(--ink);color:#fff;border-radius:12px;padding:22px;width:100%;max-width:560px;font-family:var(--font-display);font-size:19px;line-height:1.45;margin-bottom:18px;box-shadow:var(--shadow);}
-.chips-wrap{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:560px;margin-bottom:20px;}
-.chip{background:var(--card);border:2px solid #00000015;border-radius:24px;padding:11px 18px;font-size:14.5px;font-weight:600;box-shadow:var(--shadow);}
-.chip.on{border-color:var(--accent);background:var(--accent);color:#fff;}
-.feedback-panel{background:var(--card);border-radius:12px;padding:20px;width:100%;max-width:560px;box-shadow:var(--shadow);margin-bottom:18px;}
-.feedback-verdict{font-family:var(--font-display);font-size:19px;margin-bottom:8px;}
+.duel-sujet{background:var(--ink);color:#F4EEDF;border-radius:var(--radius-md);padding:26px;width:100%;max-width:560px;font-family:var(--font-display);font-weight:500;font-size:19px;line-height:1.5;margin-bottom:18px;box-shadow:var(--shadow-md);position:relative;}
+.duel-sujet::before{content:"“";position:absolute;top:2px;left:16px;font-family:var(--font-display);font-size:44px;color:rgba(244,238,223,.22);line-height:1;}
+.chips-wrap{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:560px;margin-bottom:22px;}
+.chip{background:var(--card);border:1.5px solid var(--line);border-radius:24px;padding:11px 18px;font-size:14.5px;font-weight:600;box-shadow:var(--shadow-sm);font-family:var(--font-body);transition:border-color .15s, background-color .15s, color .15s, transform .12s;}
+.chip:hover{transform:translateY(-1px);}
+.chip.on{border-color:var(--accent);background:var(--accent);color:#FBF7EE;}
+.feedback-panel{background:var(--card);border-radius:var(--radius-md);border:1px solid var(--line-soft);padding:22px;width:100%;max-width:560px;box-shadow:var(--shadow-sm);margin-bottom:18px;}
+.feedback-verdict{font-family:var(--font-display);font-weight:600;font-size:19px;margin-bottom:10px;}
 .feedback-verdict.ok{color:var(--success);}
 .feedback-verdict.half{color:var(--gold);}
 .feedback-verdict.no{color:var(--danger);}
-.feedback-explain{font-size:14.5px;line-height:1.5;color:var(--ink-soft);}
+.feedback-explain{font-size:14.5px;line-height:1.55;color:var(--ink-soft);}
 
-/* ===== END SCREEN ===== */
+/* ===== ÉCRAN DE FIN ===== */
 #screen-end{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;}
-.end-title{font-family:var(--font-display);font-size:26px;margin-bottom:10px;}
-.end-score{font-size:16px;color:var(--ink-soft);margin-bottom:6px;}
-.end-msg{font-size:14px;color:var(--ink-soft);max-width:380px;margin-bottom:24px;}
+.end-title{font-family:var(--font-display);font-weight:600;font-size:28px;margin-bottom:14px;color:var(--ink);}
+.end-score{font-family:var(--font-mono);font-size:15px;color:var(--ink-soft);margin-bottom:8px;letter-spacing:.3px;}
+.end-score strong{color:var(--ink);font-size:19px;}
+.end-msg{font-size:14px;color:var(--ink-soft);max-width:380px;margin-bottom:28px;line-height:1.55;}
 
-/* ===== MODAL ===== */
-.modal-overlay{position:fixed;inset:0;background:rgba(38,49,77,0.55);display:flex;align-items:center;justify-content:center;z-index:50;padding:20px;}
-.modal-content{background:var(--card);border-radius:14px;max-width:480px;width:100%;max-height:85vh;overflow-y:auto;padding:26px;position:relative;box-shadow:0 10px 30px rgba(0,0,0,.25);}
-.close-btn{position:absolute;top:14px;right:18px;font-size:26px;color:var(--ink-soft);cursor:pointer;line-height:1;}
-.modal-tag{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#fff;display:inline-block;padding:3px 10px;border-radius:20px;margin-bottom:12px;}
-.modal-title{font-family:var(--font-display);font-size:24px;font-weight:700;margin-bottom:2px;}
-.modal-meta{font-size:13.5px;color:var(--ink-soft);margin-bottom:14px;}
-.modal-block{margin-bottom:14px;}
-.modal-block-label{font-family:var(--font-mono);font-size:10.5px;text-transform:uppercase;letter-spacing:1px;color:var(--gold);margin-bottom:4px;}
-.modal-block-text{font-size:14.5px;line-height:1.55;}
-.modal-citation{font-family:var(--font-display);font-style:italic;font-size:15.5px;border-left:3px solid var(--accent);padding-left:12px;margin:14px 0;color:var(--ink);}
+/* ===== MODALE — FICHE ===== */
+.modal-overlay{position:fixed;inset:0;background:rgba(20,17,10,.58);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;z-index:50;padding:20px;}
+.modal-content{background:var(--card);border-radius:var(--radius-lg);max-width:500px;width:100%;max-height:85vh;overflow-y:auto;padding:30px;position:relative;box-shadow:var(--shadow-lg);border:1px solid var(--line-soft);}
+.close-btn{position:absolute;top:16px;right:18px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:22px;font-weight:300;color:var(--ink-soft);cursor:pointer;line-height:1;transition:background-color .15s, color .15s;}
+.close-btn:hover{background:rgba(32,41,63,.08);color:var(--ink);}
+.modal-tag{font-family:var(--font-mono);font-size:10.5px;text-transform:uppercase;letter-spacing:1.2px;color:#fff;display:inline-block;padding:4px 11px;border-radius:20px;margin-bottom:14px;}
+.modal-title{font-family:var(--font-display);font-size:25px;font-weight:600;margin-bottom:3px;color:var(--ink);line-height:1.2;}
+.modal-meta{font-size:13.5px;color:var(--ink-soft);margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--line);}
+.modal-block{margin-bottom:16px;}
+.modal-block-label{font-family:var(--font-mono);font-size:10.5px;text-transform:uppercase;letter-spacing:1.2px;color:var(--gold);margin-bottom:5px;}
+.modal-block-text{font-size:14.5px;line-height:1.6;color:var(--ink);}
+.modal-citation{font-family:var(--font-display);font-style:italic;font-weight:500;font-size:16px;border-left:3px solid var(--accent);padding-left:14px;margin:16px 0;color:var(--ink);line-height:1.5;}
+.modal-callout{background:var(--gold-soft);border:1px solid rgba(156,116,34,.28);border-radius:var(--radius-sm);padding:13px 15px;}
+.modal-callout .modal-block-label{margin-bottom:4px;}
 
-/* toast */
-#toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:20px;font-size:13.5px;font-weight:600;z-index:60;box-shadow:var(--shadow);}
+/* ===== TOAST ===== */
+#toast{position:fixed;top:18px;left:50%;transform:translateX(-50%);background:var(--ink);color:#F4EEDF;padding:11px 20px;border-radius:24px;font-size:13.5px;font-weight:600;z-index:60;box-shadow:var(--shadow-lg);letter-spacing:.1px;}
 </style>
 </head>
 <body>
 
 <!-- ACCUEIL : Transformé en bouton géant avec l'image en fond -->
 <div id="screen-home" role="button" aria-label="Commencer l'aventure" tabindex="0" onclick="showScreen('screen-categories')" onkeydown="if(event.key==='Enter') showScreen('screen-categories')">
-  <!-- L'image de fond gère désormais tout le visuel de l'accueil -->
+  <!-- L'image de fond gère l'essentiel du visuel de l'accueil -->
+  <div class="home-caption">Préparation à l'agrégation externe de géographie</div>
 </div>
 
 <!-- CHOIX DE LA CATEGORIE -->
 <div id="screen-categories" class="list-screen hidden">
+  <div class="header-eyebrow">ThesAgreg</div>
   <h2 class="header-title">Choisissez une catégorie</h2>
   <p class="header-sub">Deux entraînements distincts pour préparer l'agrégation externe de géographie.</p>
-  <div class="grid-modes" style="max-width:700px;">
-    <div class="mode-card" style="border-left-color:var(--accent);" onclick="selectCategory('auteurs')">
-      <span class="mode-tag">Catégorie 1</span>
-      <h3>Auteurs &amp; Thèses</h3>
-      <p>Reliez chaque auteur à son concept clé et à sa thèse, sur les six questions du programme.</p>
+  <div class="grid-modes" style="max-width:720px;">
+    <div class="mode-card" onclick="selectCategory('auteurs')">
+      <div class="tab" style="background:var(--accent);"></div>
+      <span class="card-badge">A</span>
+      <div class="card-body">
+        <span class="mode-tag">Catégorie 1</span>
+        <h3>Auteurs &amp; Thèses</h3>
+        <p>Reliez chaque auteur à son concept clé et à sa thèse, sur les six questions du programme.</p>
+      </div>
     </div>
-    <div class="mode-card" style="border-left-color:var(--gold);" onclick="selectCategory('vocab')">
-      <span class="mode-tag">Catégorie 2</span>
-      <h3>Vocabulaire</h3>
-      <p>Reliez chaque mot, notion ou expression à sa définition et à un exemple concret.</p>
+    <div class="mode-card" onclick="selectCategory('vocab')">
+      <div class="tab" style="background:var(--gold);"></div>
+      <span class="card-badge">V</span>
+      <div class="card-body">
+        <span class="mode-tag">Catégorie 2</span>
+        <h3>Vocabulaire</h3>
+        <p>Reliez chaque mot, notion ou expression à sa définition et à un exemple concret.</p>
+      </div>
     </div>
   </div>
-  <div style="margin-top:26px;margin-bottom:40px;">
+  <div style="margin-top:30px;margin-bottom:40px;">
     <button class="btn ghost" onclick="showScreen('screen-home')">Retour à l'accueil</button>
   </div>
 </div>
 
 <!-- CHOIX DE LA QUESTION -->
 <div id="screen-questions" class="list-screen hidden">
+  <div class="header-eyebrow" id="questions-eyebrow">ThesAgreg</div>
   <h2 class="header-title" id="questions-title">Choisissez une question</h2>
   <p class="header-sub" id="questions-sub">Chaque question du programme est une fiche à part — plus le fichier « Bilan » qui les mélange toutes.</p>
   <div class="grid-cards" id="questions-container"></div>
@@ -207,31 +340,48 @@ button:focus-visible, .chip:focus-visible, .data-card:focus-visible, #screen-hom
 
 <!-- CHOIX DU MODE -->
 <div id="screen-modes" class="list-screen hidden">
+  <div class="header-eyebrow">Paliers d'entraînement</div>
   <h2 class="header-title" id="modes-title">Choisissez un mode</h2>
   <p class="header-sub" id="modes-sub">Quatre paliers, du plus simple au plus proche de l'épreuve : consulter, associer, deviner, mobiliser.</p>
   <div class="grid-modes">
-    <div class="mode-card" style="border-left-color:#5A5248;" onclick="startMode('decouverte')">
-      <span class="mode-tag">Palier 0 · Étude</span>
-      <h3>Découverte</h3>
-      <p>Consultez les fiches auteurs complètes, sans jouer, pour apprendre ou réviser.</p>
+    <div class="mode-card" onclick="startMode('decouverte')">
+      <div class="tab" style="background:var(--q-toutes);"></div>
+      <span class="card-badge">0</span>
+      <div class="card-body">
+        <span class="mode-tag">Étude</span>
+        <h3>Découverte</h3>
+        <p>Consultez les fiches complètes, sans jouer, pour apprendre ou réviser.</p>
+      </div>
     </div>
     <div class="mode-card" onclick="startMode('association')">
-      <span class="mode-tag">Palier 1 · Reconnaissance</span>
-      <h3>Association</h3>
-      <p>Reliez chaque auteur à son concept clé, puis à sa thèse. 3 vies.</p>
+      <div class="tab" style="background:var(--accent);"></div>
+      <span class="card-badge">I</span>
+      <div class="card-body">
+        <span class="mode-tag">Reconnaissance</span>
+        <h3>Association</h3>
+        <p>Reliez chaque fiche à son concept clé, puis à sa thèse. 3 vies.</p>
+      </div>
     </div>
     <div class="mode-card" onclick="startMode('quisuisje')">
-      <span class="mode-tag">Palier 2 · Rappel actif</span>
-      <h3>Qui suis-je ?</h3>
-      <p>Devinez l'auteur à partir d'indices progressifs. Moins d'indices = plus de points.</p>
+      <div class="tab" style="background:var(--gold);"></div>
+      <span class="card-badge">II</span>
+      <div class="card-body">
+        <span class="mode-tag">Rappel actif</span>
+        <h3>Qui suis-je ?</h3>
+        <p>Devinez la réponse à partir d'indices progressifs. Moins d'indices = plus de points.</p>
+      </div>
     </div>
     <div class="mode-card" id="mode-card-duel" onclick="startMode('duel')">
-      <span class="mode-tag">Palier 3 · Mobilisation</span>
-      <h3>Duel historiographique</h3>
-      <p>Face à un sujet, choisissez les deux auteurs à mobiliser en tension.</p>
+      <div class="tab" style="background:var(--ink);"></div>
+      <span class="card-badge">III</span>
+      <div class="card-body">
+        <span class="mode-tag">Mobilisation</span>
+        <h3>Duel historiographique</h3>
+        <p>Face à un sujet, choisissez les deux auteurs à mobiliser en tension.</p>
+      </div>
     </div>
   </div>
-  <div style="margin-top:26px;margin-bottom:40px;">
+  <div style="margin-top:30px;margin-bottom:40px;">
     <button class="btn ghost" onclick="showScreen('screen-questions')">Retour aux questions</button>
   </div>
 </div>
@@ -343,7 +493,7 @@ button:focus-visible, .chip:focus-visible, .data-card:focus-visible, #screen-hom
     <div class="modal-citation hidden" id="modal-citation-wrap">
       <span id="modal-citation"></span>
     </div>
-    <div class="modal-block hidden" id="modal-remarque-wrap">
+    <div class="modal-block modal-callout hidden" id="modal-remarque-wrap">
       <div class="modal-block-label" id="modal-remarque-label">Limites</div>
       <div class="modal-block-text" id="modal-remarque"></div>
     </div>
@@ -648,7 +798,12 @@ function chunk(arr, size){
 function byId(id){ return AUTEURS.find(a=>a.id===id) || VOCAB.find(a=>a.id===id); }
 function currentItems(){ return state.category === "vocab" ? VOCAB : AUTEURS; }
 function questionInfo(qid){ return QUESTIONS.find(q=>q.id===qid); }
-function livesHtml(n){ return "❤️".repeat(Math.max(n,0)) + "🖤".repeat(Math.max(3-n,0)); }
+function livesHtml(n){
+  const on = Math.max(n,0), off = Math.max(3-n,0);
+  return '<span class="life-dot"></span>'.repeat(on) + '<span class="life-dot off"></span>'.repeat(off);
+}
+// Icône flèche circulaire (révision), utilisée à la place d'un emoji pour un rendu homogène.
+const ICON_REFRESH = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 1 2.64 6.36"/><path d="M3 21v-6.5h6.5"/></svg>';
 function toast(msg){
   const t = document.getElementById("toast");
   t.textContent = msg;
@@ -777,6 +932,7 @@ function renderQuestions(){
   const isVocab = state.category === "vocab";
   const unit = isVocab ? "mot" : "auteur";
 
+  document.getElementById("questions-eyebrow").textContent = isVocab ? "Vocabulaire" : "Auteurs & Thèses";
   document.getElementById("questions-title").textContent = isVocab ? "Choisissez un thème de vocabulaire" : "Choisissez une question";
   document.getElementById("questions-sub").textContent = isVocab
     ? "Chaque thème du programme regroupe les mots, notions et expressions à maîtriser — plus le fichier « Bilan » qui les mélange tous."
@@ -789,11 +945,11 @@ function renderQuestions(){
   revisionCard.tabIndex = 0;
   revisionCard.innerHTML = `<div class="tab" style="background:var(--danger);"></div>
     <div class="card-body">
-      <div class="card-title">🔁 Points faibles</div>
+      <div class="card-title" style="display:flex;align-items:center;gap:8px;">${ICON_REFRESH}<span>Points faibles</span></div>
       <div class="card-meta">${dueCount > 0 ? dueCount + " " + unit + "(s) à réviser aujourd'hui" : "Entraînement libre sur vos points les moins solides"}</div>
       <div class="card-count">${items.length} ${unit}s suivis</div>
     </div>
-    <span class="reset-srs-btn" id="reset-srs-btn" title="Réinitialiser le suivi de révision">⟲</span>`;
+    <span class="reset-srs-btn" id="reset-srs-btn" title="Réinitialiser le suivi de révision"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg></span>`;
   revisionCard.onclick = () => selectRevision();
   container.appendChild(revisionCard);
   document.getElementById("reset-srs-btn").onclick = (e) => {
@@ -846,7 +1002,7 @@ function selectRevision(){
   state.questionId = "revision";
   state.pool = pool;
   const unit = state.category === "vocab" ? "mot" : "auteur";
-  document.getElementById("modes-title").textContent = "🔁 Points faibles (" + pool.length + " " + unit + (pool.length>1?"s":"") + ")";
+  document.getElementById("modes-title").innerHTML = '<span style="display:inline-flex;align-items:center;gap:10px;">' + ICON_REFRESH + '<span>Points faibles (' + pool.length + ' ' + unit + (pool.length>1?"s":"") + ')</span></span>';
   updateModesForCategory();
   showScreen("screen-modes");
 }
@@ -873,7 +1029,8 @@ function replayLast(){
 ======================================================================== */
 function initDecouverte(){
   showScreen("screen-decouverte");
-  document.getElementById("discover-count").textContent = state.pool.length + " fiche(s)";
+  const isVocab = state.category === "vocab";
+  document.getElementById("discover-count").textContent = state.pool.length + (isVocab ? " mot(s)" : " fiche(s)");
   const container = document.getElementById("discover-container");
   container.innerHTML = "";
   state.pool.forEach(a=>{
@@ -881,12 +1038,20 @@ function initDecouverte(){
     const card = document.createElement("div");
     card.className = "data-card";
     card.tabIndex = 0;
-    card.innerHTML = `<div class="tab" style="background:${q.color};"></div>
-      <div class="card-body">
-        <div class="card-title">${a.nom}</div>
-        <div class="card-meta">${a.identite}</div>
-        <div class="concept-tag">${a.conceptCard}</div>
-      </div>`;
+    // Sur le vocabulaire, la définition est une phrase complète : elle se lit
+    // comme un texte (avec recadrage), pas comme une étiquette courte.
+    card.innerHTML = isVocab
+      ? `<div class="tab" style="background:${q.color};"></div>
+        <div class="card-body">
+          <div class="card-title">${a.nom}</div>
+          <div class="card-def">${a.conceptCard}</div>
+        </div>`
+      : `<div class="tab" style="background:${q.color};"></div>
+        <div class="card-body">
+          <div class="card-title">${a.nom}</div>
+          <div class="card-meta">${a.identite}</div>
+          <div class="concept-tag">${a.conceptCard}</div>
+        </div>`;
     card.onclick = () => openModal(a.id);
     container.appendChild(card);
   });
