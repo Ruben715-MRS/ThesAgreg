@@ -166,6 +166,16 @@ button:focus-visible, .chip:focus-visible, .data-card:focus-visible, #screen-hom
 .modal-block-text{font-size:14.5px;line-height:1.55;}
 .modal-citation{font-family:var(--font-display);font-style:italic;font-size:15.5px;border-left:3px solid var(--accent);padding-left:12px;margin:14px 0;color:var(--ink);}
 
+/* ===== VEILLE D'ACTUALITE ===== */
+.veille-desc{font-size:14.5px;line-height:1.55;color:var(--ink-soft);margin-bottom:18px;}
+.veille-links{display:flex;flex-direction:column;gap:10px;}
+.veille-link{display:flex;align-items:center;gap:12px;background:var(--card);border:2px solid #00000012;border-radius:10px;padding:12px 14px;font-size:14.5px;text-decoration:none;color:var(--ink);box-shadow:var(--shadow);transition:all .15s;}
+.veille-link:hover{border-color:var(--accent-soft);transform:translateY(-2px);}
+.veille-link-icon{font-size:19px;line-height:1;flex-shrink:0;}
+.veille-link-text{display:flex;flex-direction:column;gap:2px;}
+.veille-link-label{font-weight:700;}
+.veille-link-sub{font-size:12px;color:var(--ink-soft);}
+
 /* toast */
 #toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:20px;font-size:13.5px;font-weight:600;z-index:60;box-shadow:var(--shadow);}
 </style>
@@ -180,8 +190,8 @@ button:focus-visible, .chip:focus-visible, .data-card:focus-visible, #screen-hom
 <!-- CHOIX DE LA CATEGORIE -->
 <div id="screen-categories" class="list-screen hidden">
   <h2 class="header-title">Choisissez une catégorie</h2>
-  <p class="header-sub">Deux entraînements distincts pour préparer l'agrégation externe de géographie.</p>
-  <div class="grid-modes" style="max-width:700px;">
+  <p class="header-sub">Trois entraînements distincts pour préparer l'agrégation externe de géographie.</p>
+  <div class="grid-modes" style="max-width:960px;">
     <div class="mode-card" style="border-left-color:var(--accent);" onclick="selectCategory('auteurs')">
       <span class="mode-tag">Catégorie 1</span>
       <h3>Auteurs &amp; Thèses</h3>
@@ -191,6 +201,11 @@ button:focus-visible, .chip:focus-visible, .data-card:focus-visible, #screen-hom
       <span class="mode-tag">Catégorie 2</span>
       <h3>Vocabulaire</h3>
       <p>Reliez chaque mot, notion ou expression à sa définition et à un exemple concret.</p>
+    </div>
+    <div class="mode-card" style="border-left-color:var(--q-pacifique);" onclick="selectCategory('veille')">
+      <span class="mode-tag">Catégorie 3</span>
+      <h3>Veille d'actualité</h3>
+      <p>Suivez, question par question, les articles et analyses qui éclairent l'actualité du programme.</p>
     </div>
   </div>
   <div style="margin-top:26px;margin-bottom:40px;">
@@ -203,6 +218,16 @@ button:focus-visible, .chip:focus-visible, .data-card:focus-visible, #screen-hom
   <h2 class="header-title" id="questions-title">Choisissez une question</h2>
   <p class="header-sub" id="questions-sub">Chaque question du programme est une fiche à part — plus le fichier « Bilan » qui les mélange toutes.</p>
   <div class="grid-cards" id="questions-container"></div>
+  <div style="margin-top:26px;margin-bottom:40px;">
+    <button class="btn ghost" onclick="showScreen('screen-categories')">Retour aux catégories</button>
+  </div>
+</div>
+
+<!-- VEILLE D'ACTUALITE : CHOIX DU THEME -->
+<div id="screen-veille" class="list-screen hidden">
+  <h2 class="header-title">Veille d'actualité</h2>
+  <p class="header-sub">Choisissez une question du programme pour ouvrir une sélection de flux de recherche toujours à jour, sur des mots-clés adaptés.</p>
+  <div class="grid-cards" id="veille-container"></div>
   <div style="margin-top:26px;margin-bottom:40px;">
     <button class="btn ghost" onclick="showScreen('screen-categories')">Retour aux catégories</button>
   </div>
@@ -365,6 +390,17 @@ button:focus-visible, .chip:focus-visible, .data-card:focus-visible, #screen-hom
       <button class="btn ghost" id="confirm-cancel-btn">Annuler</button>
       <button class="btn" id="confirm-ok-btn">Confirmer</button>
     </div>
+  </div>
+</div>
+
+<!-- MODAL VEILLE D'ACTUALITE -->
+<div id="modal-veille" class="modal-overlay hidden">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeVeilleModal()">×</span>
+    <span class="modal-tag" id="veille-modal-tag"></span>
+    <div class="modal-title" id="veille-modal-title"></div>
+    <p class="veille-desc" id="veille-modal-desc"></p>
+    <div class="veille-links" id="veille-modal-links"></div>
   </div>
 </div>
 
@@ -632,6 +668,43 @@ const VOCAB = [
   {id:"v_camp_petrole_vert", question:"campagne", nom:"Pétrole vert", identite:"Expression imagée", courant:"Histoire économique agricole", terrain:"France, XXe siècle", conceptCard:"L'expression désignant la transformation de l'agriculture française en une véritable industrie agro-alimentaire exportatrice.", theseCard:"La France valorise ses excédents agricoles comme un atout économique comparable à une ressource énergétique stratégique.", theseFull:"Expression imagée désignant la mutation de l'agriculture française en puissante industrie agro-alimentaire, dont les excédents exportables sont présentés, notamment à partir des années 1960-1970, comme un atout économique national comparable à une ressource stratégique.", oeuvre:"L'essor des filières agro-alimentaires françaises exportatrices (céréales, produits laitiers) à partir des années 1960."}
 ];
 
+/* ---- VEILLE D'ACTUALITE ----
+   Catégorie 3 : pas de banque de questions figée, mais des flux de
+   recherche externes toujours à jour, un jeu de mots-clés par question. */
+const VEILLE_SOURCES = [
+  {label:"Google Actualités", icon:"📰", sub:"Le fil de presse en continu, toutes sources confondues.", url:(q)=>`https://news.google.com/search?q=${encodeURIComponent(q)}&hl=fr&gl=FR&ceid=FR:fr`},
+  {label:"The Conversation France", icon:"🎓", sub:"Des analyses rédigées par des chercheurs, en accès libre.", url:(q)=>`https://theconversation.com/fr/search?q=${encodeURIComponent(q)}`},
+  {label:"Le Monde", icon:"🗞️", sub:"Le moteur de recherche du quotidien de référence.", url:(q)=>`https://www.lemonde.fr/recherche/?search_keywords=${encodeURIComponent(q)}`},
+  {label:"Diploweb", icon:"🌍", sub:"La revue géopolitique en ligne.", url:(q)=>`https://www.diploweb.com/spip.php?page=recherche&recherche=${encodeURIComponent(q)}`}
+];
+
+const VEILLE_THEMES = {
+  sante: {
+    requete:"géographie de la santé inégalités accès aux soins déserts médicaux",
+    desc:"Déserts médicaux, crises sanitaires, mondialisation du soin, inégalités territoriales d'accès aux soins : suivez les débats qui nourrissent la question."
+  },
+  etat: {
+    requete:"géographie politique de l'État frontières souveraineté",
+    desc:"Recompositions frontalières, tensions de souveraineté, politiques d'aménagement du territoire : l'actualité de l'État comme objet géographique."
+  },
+  france: {
+    requete:"aménagement du territoire France ruralité métropolisation fracture territoriale",
+    desc:"Métropolisation, fractures territoriales, politiques d'aménagement : l'actualité française relue à travers la géographie."
+  },
+  pacifique: {
+    requete:"géopolitique du Pacifique Océanie îles changement climatique",
+    desc:"Rivalités géopolitiques, montée des eaux, tourisme, décolonisation : suivez l'actualité du bassin pacifique."
+  },
+  ameriques: {
+    requete:"histoire coloniale Amériques XVIe XVIIe siècle recherche historiographie",
+    desc:"Publications, expositions et débats historiographiques autour de la colonisation ibérique et nord-américaine (1550-1660)."
+  },
+  campagne: {
+    requete:"monde rural France ruralité histoire agricole",
+    desc:"Renouveau rural, agribashing, patrimoine paysan : les échos contemporains d'une question historique sur le temps long (1815-1970)."
+  }
+};
+
 /* ========================================================================
    UTILITAIRES
 ======================================================================== */
@@ -753,13 +826,18 @@ const state = {
 
 function selectCategory(cat){
   state.category = cat;
-  showScreen("screen-questions");
+  if(cat === "veille"){
+    showScreen("screen-veille");
+  } else {
+    showScreen("screen-questions");
+  }
 }
 
 function showScreen(id){
   document.querySelectorAll("body > div[id^='screen-']").forEach(s => s.classList.add("hidden"));
   document.getElementById(id).classList.remove("hidden");
   if(id === "screen-questions") renderQuestions();
+  if(id === "screen-veille") renderVeille();
 }
 
 // Le duel n'existe que pour la catégorie « Auteurs & Thèses »
@@ -1290,6 +1368,57 @@ function openModal(id){
 }
 function closeModal(){
   document.getElementById("modal-fiche").classList.add("hidden");
+}
+
+/* ========================================================================
+   VEILLE D'ACTUALITE
+======================================================================== */
+function renderVeille(){
+  const container = document.getElementById("veille-container");
+  container.innerHTML = "";
+  QUESTIONS.forEach(q=>{
+    const theme = VEILLE_THEMES[q.id];
+    const card = document.createElement("div");
+    card.className = "data-card";
+    card.tabIndex = 0;
+    card.innerHTML = `<div class="tab" style="background:${q.color};"></div>
+      <div class="card-body">
+        <div class="card-title">${q.nom}</div>
+        <div class="card-meta">${theme.desc}</div>
+        <div class="card-count">${VEILLE_SOURCES.length} flux d'actualité</div>
+      </div>`;
+    card.onclick = () => openVeilleModal(q.id);
+    card.onkeydown = (e) => { if(e.key === "Enter") openVeilleModal(q.id); };
+    container.appendChild(card);
+  });
+}
+
+function openVeilleModal(qid){
+  const q = questionInfo(qid);
+  const theme = VEILLE_THEMES[qid];
+  const tag = document.getElementById("veille-modal-tag");
+  tag.textContent = q.nom;
+  tag.style.background = q.color;
+  document.getElementById("veille-modal-title").textContent = "Veille — " + q.nom;
+  document.getElementById("veille-modal-desc").textContent = theme.desc;
+
+  const linksContainer = document.getElementById("veille-modal-links");
+  linksContainer.innerHTML = "";
+  VEILLE_SOURCES.forEach(src=>{
+    const a = document.createElement("a");
+    a.className = "veille-link";
+    a.href = src.url(theme.requete);
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    a.innerHTML = `<span class="veille-link-icon">${src.icon}</span><span class="veille-link-text"><span class="veille-link-label">${src.label}</span><span class="veille-link-sub">${src.sub}</span></span>`;
+    linksContainer.appendChild(a);
+  });
+
+  document.getElementById("modal-veille").classList.remove("hidden");
+}
+
+function closeVeilleModal(){
+  document.getElementById("modal-veille").classList.add("hidden");
 }
 
 window.onload = () => showScreen("screen-home");
