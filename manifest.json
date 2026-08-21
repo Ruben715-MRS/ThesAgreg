@@ -1,0 +1,19 @@
+{
+  "name": "ThesAgreg — Auteurs, thèses & vocabulaire",
+  "short_name": "ThesAgreg",
+  "description": "Réviser les auteurs, thèses et le vocabulaire du programme de géographie de l'agrégation externe, avec un système de révision espacée utilisable hors ligne.",
+  "id": "/index.html",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "lang": "fr",
+  "background_color": "#EAE2D0",
+  "theme_color": "#26314D",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
