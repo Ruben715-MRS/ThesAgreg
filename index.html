@@ -765,7 +765,7 @@ function initAssociation(){
   state.lastMode = "association";
   const pool = shuffle(state.pool);
   assoc = {
-    batches: chunk(pool, 4),
+    batches: [pool], // un seul lot : tous les auteurs/concepts visibles en même temps
     batchIndex: 0,
     phase: "concept", // "concept" -> "these"
     score: 0,
@@ -780,9 +780,11 @@ function initAssociation(){
 function currentAssocBatch(){ return assoc.batches[assoc.batchIndex]; }
 
 function renderAssociation(){
+  const batch = currentAssocBatch();
   document.getElementById("assoc-score").textContent = assoc.score + " pts";
   document.getElementById("assoc-lives").innerHTML = livesHtml(assoc.lives);
-  document.getElementById("assoc-progress").textContent = "Lot " + (assoc.batchIndex+1) + "/" + assoc.batches.length;
+  document.getElementById("assoc-progress").textContent = assoc.matched.size + "/" + batch.length
+    + (assoc.phase === "concept" ? " · concepts" : " · thèses");
   const isVocab = state.category === "vocab";
   document.getElementById("assoc-left-label").textContent = isVocab ? "Vocabulaire" : "Auteurs";
   document.getElementById("assoc-right-label").textContent = assoc.phase === "concept"
@@ -792,7 +794,6 @@ function renderAssociation(){
     ? (isVocab ? "Touchez un mot, puis touchez sa définition." : "Touchez un auteur, puis touchez son concept clé.")
     : (isVocab ? "Touchez un mot, puis touchez son exemple concret." : "Touchez un auteur, puis touchez sa thèse principale.");
 
-  const batch = currentAssocBatch();
   const left = document.getElementById("assoc-left");
   const right = document.getElementById("assoc-right");
   left.innerHTML = "";
